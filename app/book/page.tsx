@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { Metadata } from 'next'
 import { chapters } from '@/lib/content/chapters'
 
@@ -22,25 +23,17 @@ export default function BookPage() {
       <section className="bg-primary-500 pt-32 pb-20">
         <div className="container-custom">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Book Cover Placeholder */}
+            {/* Book Cover */}
             <div className="order-2 lg:order-1">
-              <div className="aspect-[3/4] max-w-md mx-auto bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-lg shadow-hard flex items-center justify-center">
-                <div className="text-center p-8">
-                  <div className="text-secondary-400 font-sans font-semibold text-sm uppercase tracking-wider mb-4">
-                    Yale University Press
-                  </div>
-                  <h2 className="font-serif text-3xl text-white mb-2">
-                    Designed to Fail
-                  </h2>
-                  <p className="text-white/70 text-sm">
-                    Why Americans Love Their Country<br />and Hate Their Government
-                  </p>
-                  <div className="mt-6 pt-6 border-t border-white/20">
-                    <p className="text-white/50 text-sm">
-                      Sven Steinmo &amp; John D&apos;Attoma
-                    </p>
-                  </div>
-                </div>
+              <div className="max-w-md mx-auto">
+                <Image
+                  src="/images/book-cover.jpg"
+                  alt="Designed to Fail book cover showing American flag fragmenting over the Capitol building with citizens looking on"
+                  width={600}
+                  height={900}
+                  className="rounded-lg shadow-hard w-full h-auto"
+                  priority
+                />
               </div>
             </div>
 
