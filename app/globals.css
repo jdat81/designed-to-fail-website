@@ -1,0 +1,214 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply antialiased scroll-smooth;
+  }
+
+  body {
+    @apply font-sans text-neutral-900 bg-neutral-50;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif font-bold tracking-tight;
+  }
+
+  /* Smooth transitions for all interactive elements */
+  a, button {
+    @apply transition-all duration-200;
+  }
+}
+
+@layer components {
+  /* Container */
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .container-narrow {
+    @apply max-w-4xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Section spacing - Conversion Code style: generous vertical rhythm */
+  .section {
+    @apply py-20 md:py-28 lg:py-36;
+  }
+
+  .section-tight {
+    @apply py-12 md:py-16 lg:py-20;
+  }
+
+  /* Buttons - Bold, conversion-focused */
+  .btn {
+    @apply inline-flex items-center justify-center font-sans font-bold rounded-lg transition-all duration-300;
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2;
+  }
+
+  .btn-primary {
+    @apply btn bg-accent-red text-white px-8 py-4 text-lg;
+    @apply hover:bg-accent-red-light hover:-translate-y-1 hover:shadow-hard;
+    @apply active:translate-y-0;
+  }
+
+  .btn-secondary {
+    @apply btn bg-transparent border-2 border-primary-500 text-primary-500 px-8 py-4 text-lg;
+    @apply hover:bg-primary-500 hover:text-white hover:-translate-y-1;
+  }
+
+  .btn-ghost {
+    @apply btn bg-transparent text-neutral-700 px-6 py-3;
+    @apply hover:bg-neutral-100 hover:text-neutral-900;
+  }
+
+  /* Cards */
+  .card {
+    @apply bg-white rounded-2xl border border-neutral-200 overflow-hidden;
+    @apply transition-all duration-300;
+    @apply focus-within:ring-2 focus-within:ring-primary-500 focus-within:ring-offset-2;
+  }
+
+  .card-hover {
+    @apply card hover:shadow-hard hover:-translate-y-2 cursor-pointer;
+  }
+
+  /* Skip to main content link for keyboard users */
+  .skip-link {
+    @apply fixed top-0 left-0 z-[100] px-4 py-2;
+    @apply bg-primary-500 text-white font-semibold;
+    @apply -translate-y-full focus:translate-y-0;
+    @apply transition-transform duration-200;
+  }
+
+  /* Statistics display - Conversion Code style */
+  .stat-number {
+    @apply text-display-xl font-serif font-bold text-primary-500;
+  }
+
+  .stat-label {
+    @apply text-body-lg font-sans text-neutral-600 uppercase tracking-wider;
+  }
+
+  /* Quote blocks */
+  .blockquote {
+    @apply border-l-4 border-secondary-500 pl-6 py-2 italic;
+    @apply text-title font-serif text-neutral-700;
+  }
+}
+
+@layer utilities {
+  /* Text gradient */
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-500 to-accent-red;
+  }
+
+  /* Glass effect */
+  .glass {
+    @apply bg-white/90 backdrop-blur-md;
+  }
+
+  /* Scroll reveal animation triggers */
+  .reveal {
+    @apply opacity-0 translate-y-8;
+  }
+
+  .reveal.active {
+    @apply opacity-100 translate-y-0 transition-all duration-700 ease-out;
+  }
+
+  /* Image zoom on hover - enhanced */
+  .image-zoom {
+    @apply overflow-hidden;
+  }
+
+  .image-zoom img {
+    @apply transition-transform duration-500 ease-out;
+  }
+
+  .image-zoom:hover img {
+    @apply scale-110;
+  }
+
+  /* Animated underline on hover */
+  .link-underline {
+    @apply relative inline-block;
+  }
+
+  .link-underline::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-0 h-0.5 bg-current;
+    @apply transition-all duration-300 ease-out;
+  }
+
+  .link-underline:hover::after {
+    @apply w-full;
+  }
+
+  .link-underline:focus-visible::after {
+    @apply w-full;
+  }
+
+  /* Shine effect on buttons */
+  .btn-shine {
+    @apply relative overflow-hidden;
+  }
+
+  .btn-shine::before {
+    content: '';
+    @apply absolute top-0 -left-full w-full h-full;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.3),
+      transparent
+    );
+    @apply transition-all duration-500 ease-out;
+  }
+
+  .btn-shine:hover::before {
+    @apply left-full;
+  }
+
+  /* Enhanced card lift on hover */
+  .card-lift {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  .card-lift:hover {
+    @apply -translate-y-3 shadow-hard;
+  }
+
+  .card-lift:active {
+    @apply -translate-y-1 shadow-medium;
+  }
+}
+
+/* Accessibility: Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Disable micro-interaction animations */
+  .link-underline::after {
+    transition: none !important;
+  }
+
+  .btn-shine::before {
+    display: none !important;
+  }
+
+  .card-lift:hover {
+    transform: none !important;
+  }
+
+  .image-zoom:hover img {
+    transform: none !important;
+  }
+}
