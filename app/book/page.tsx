@@ -27,7 +27,7 @@ export default function BookPage() {
             <div className="order-2 lg:order-1">
               <div className="max-w-md mx-auto">
                 <Image
-                  src="/images/book-cover.jpg"
+                  src="/images/cover.jpg"
                   alt="Designed to Fail book cover showing American flag fragmenting over the Capitol building with citizens looking on"
                   width={600}
                   height={900}

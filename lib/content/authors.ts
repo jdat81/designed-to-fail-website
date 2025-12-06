@@ -4,6 +4,7 @@ export interface Author {
   role: string
   years?: string
   isMemorial: boolean
+  image?: string
   shortBio: string
   fullBio: string[]
   credentials: string[]
@@ -22,6 +23,7 @@ export const authors: Author[] = [
     role: 'Political Scientist',
     years: '1953–2024',
     isMemorial: true,
+    // image: '/images/sven-steinmo.jpg', // Add when available
     shortBio: 'One of the most influential political scientists of his generation. Steinmo coined the term "historical institutionalism" and transformed how we understand the relationship between institutions and political outcomes.',
     fullBio: [
       'Sven Steinmo (1953–2024) was one of the most influential political scientists of his generation. A professor at the University of Colorado Boulder and later at the European University Institute in Florence, Italy, Steinmo spent his career examining how institutions shape political outcomes and why similar democracies produce such different results.',
@@ -68,6 +70,7 @@ export const authors: Author[] = [
     slug: 'john-dattoma',
     role: 'Political Scientist',
     isMemorial: false,
+    image: '/images/JohnD.JPG',
     shortBio: 'Specializing in comparative politics, political economy, and experimental methods. D\'Attoma completed this manuscript after Steinmo\'s passing, carrying forward their shared vision of understanding how institutional design shapes democratic outcomes.',
     fullBio: [
       'John D\'Attoma is a political scientist specializing in comparative politics, political economy, and experimental methods. His research examines how institutions shape citizen behavior, tax compliance, and trust in government.',
