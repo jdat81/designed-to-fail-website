@@ -12,6 +12,7 @@ export interface Figure {
   number: string
   slug: string
   caption: string
+  image: string
   context: string
   chapter: number
   theme: 'territory' | 'economy' | 'inequality' | 'trust'

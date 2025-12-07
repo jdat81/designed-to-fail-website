@@ -1,28 +1,12 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { Metadata } from 'next'
+import { authors } from '@/lib/content/authors'
 
 export const metadata: Metadata = {
   title: 'Authors',
   description: 'Meet Sven Steinmo and John D\'Attoma, the authors of Designed to Fail.',
 }
-
-const authors = [
-  {
-    name: 'Sven Steinmo',
-    slug: 'sven-steinmo',
-    role: 'Political Scientist',
-    years: '1953–2024',
-    shortBio: 'One of the most influential political scientists of his generation. Steinmo coined the term "historical institutionalism" and transformed how we understand the relationship between institutions and political outcomes.',
-    isMemorial: true,
-  },
-  {
-    name: 'John D\'Attoma',
-    slug: 'john-dattoma',
-    role: 'Political Scientist',
-    shortBio: 'Specializing in comparative politics, political economy, and experimental methods. D\'Attoma completed this manuscript after Steinmo\'s passing, carrying forward their shared vision of understanding how institutional design shapes democratic outcomes.',
-    isMemorial: false,
-  },
-]
 
 export default function AuthorsPage() {
   return (
@@ -49,15 +33,25 @@ export default function AuthorsPage() {
             {authors.map((author) => (
               <Link key={author.slug} href={`/authors/${author.slug}`}>
                 <div className="card-hover group h-full">
-                  {/* Image Placeholder */}
+                  {/* Author Image */}
                   <div className="aspect-[4/3] bg-gradient-to-br from-primary-500 to-primary-700 relative overflow-hidden">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-32 h-32 rounded-full bg-white/20 flex items-center justify-center">
-                        <svg className="w-16 h-16 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
+                    {author.image ? (
+                      <Image
+                        src={author.image}
+                        alt={`${author.name} - ${author.role}`}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-32 h-32 rounded-full bg-white/20 flex items-center justify-center">
+                          <svg className="w-16 h-16 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                        </div>
                       </div>
-                    </div>
+                    )}
                     {author.isMemorial && (
                       <div className="absolute top-4 left-4">
                         <span className="px-3 py-1 bg-secondary-500 text-primary-500 text-xs font-semibold rounded-full">

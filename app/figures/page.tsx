@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { figures } from '@/lib/content/figures'
 import { cn } from '@/lib/utils/cn'
 
@@ -75,15 +76,17 @@ export default function FiguresPage() {
             {filteredFigures.map((figure) => (
               <Link key={figure.slug} href={`/figures/${figure.slug}`}>
                 <div className="card-hover group h-full">
-                  {/* Image Placeholder */}
-                  <div className="aspect-[4/3] bg-gradient-to-br from-neutral-100 to-neutral-200 relative overflow-hidden">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <svg className="w-16 h-16 text-neutral-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                      </svg>
-                    </div>
+                  {/* Figure Image */}
+                  <div className="aspect-[4/3] bg-white relative overflow-hidden">
+                    <Image
+                      src={figure.image}
+                      alt={figure.caption}
+                      fill
+                      className="object-contain p-2"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
                     {/* Theme Badge */}
-                    <div className="absolute top-4 left-4">
+                    <div className="absolute top-4 left-4 z-10">
                       <span className={cn(
                         'px-3 py-1 rounded-full text-xs font-semibold capitalize',
                         themeColors[figure.theme]

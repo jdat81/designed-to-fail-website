@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { motion, useInView } from 'framer-motion'
 import { cn } from '@/lib/utils/cn'
 
@@ -103,8 +104,9 @@ export default function Hero() {
 
       {/* Content */}
       <div className="relative container-custom py-32 lg:py-40">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
         <motion.div
-          className="max-w-5xl"
+          className="max-w-xl"
           initial="hidden"
           animate="visible"
           variants={containerVariants}
@@ -168,7 +170,7 @@ export default function Hero() {
           {/* Stats - Conversion Code Style with emphasis on trust decline */}
           <motion.div
             variants={itemVariants}
-            className="grid grid-cols-2 lg:grid-cols-4 gap-8 pt-12 border-t border-white/10"
+            className="grid grid-cols-2 gap-6 pt-12 border-t border-white/10"
           >
             {stats.map((stat, index) => (
               <motion.div
@@ -181,13 +183,13 @@ export default function Hero() {
                 )}
               >
                 <div className={cn(
-                  'text-display font-serif font-bold mb-2',
+                  'text-headline font-serif font-bold mb-1',
                   stat.highlight ? 'text-accent-red' : 'text-white'
                 )}>
                   <AnimatedCounter target={stat.number} suffix={stat.suffix} duration={stat.highlight ? 2500 : 2000} />
                 </div>
                 <div className={cn(
-                  'text-small font-sans font-semibold uppercase tracking-wider',
+                  'text-xs font-sans font-semibold uppercase tracking-wider',
                   stat.highlight ? 'text-accent-red/80' : 'text-white/50'
                 )}>
                   {stat.label}
@@ -196,6 +198,43 @@ export default function Hero() {
             ))}
           </motion.div>
         </motion.div>
+
+        {/* Book Cover */}
+        <motion.div
+          initial={{ opacity: 0, x: 50, rotateY: -15 }}
+          animate={{ opacity: 1, x: 0, rotateY: 0 }}
+          transition={{ duration: 0.8, delay: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+          className="hidden lg:flex justify-center lg:justify-end"
+        >
+          <div className="relative">
+            {/* Shadow/Glow Effect */}
+            <div className="absolute -inset-4 bg-gradient-to-br from-secondary-400/20 to-accent-red/20 rounded-2xl blur-2xl" />
+
+            {/* Book Cover Image */}
+            <div className="relative">
+              {/* White background to replace transparency */}
+              <div className="absolute inset-0 bg-white rounded-lg z-0" />
+              <Image
+                src="/images/cover.png"
+                alt="Designed to Fail book cover - American flag fragmenting over the Capitol building"
+                width={500}
+                height={750}
+                className="rounded-lg shadow-hard relative z-10 max-w-full h-auto"
+                priority
+                unoptimized
+                style={{ backgroundColor: '#ffffff' }}
+              />
+
+              {/* Decorative Badge */}
+              <div className="absolute -top-4 -right-4 z-20">
+                <div className="bg-secondary-500 text-primary-500 px-4 py-2 rounded-full font-sans font-bold text-sm shadow-medium">
+                  Coming August 2025
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+        </div>
       </div>
 
       {/* Scroll Indicator */}

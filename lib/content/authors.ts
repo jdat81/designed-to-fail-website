@@ -70,7 +70,7 @@ export const authors: Author[] = [
     slug: 'john-dattoma',
     role: 'Political Scientist',
     isMemorial: false,
-    image: '/images/JohnD.JPG',
+    image: '/images/authors/JohnD.JPG',
     shortBio: 'Specializing in comparative politics, political economy, and experimental methods. D\'Attoma completed this manuscript after Steinmo\'s passing, carrying forward their shared vision of understanding how institutional design shapes democratic outcomes.',
     fullBio: [
       'John D\'Attoma is a political scientist specializing in comparative politics, political economy, and experimental methods. His research examines how institutions shape citizen behavior, tax compliance, and trust in government.',

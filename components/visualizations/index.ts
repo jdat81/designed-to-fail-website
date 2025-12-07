@@ -1,3 +1,8 @@
 export { default as TrustDeclineChart } from './TrustDeclineChart'
 export { default as IncomeInequalityChart } from './IncomeInequalityChart'
 export { default as TerritoryTimeline } from './TerritoryTimeline'
+export { default as HousingBubbleChart } from './HousingBubbleChart'
+export { default as WalmartGrowthChart } from './WalmartGrowthChart'
+export { default as WealthDistributionChart } from './WealthDistributionChart'
+export { default as MineralOutputChart } from './MineralOutputChart'
+export { default as StateHomePricesChart } from './StateHomePricesChart'

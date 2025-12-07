@@ -25,14 +25,18 @@ export default function BookPage() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Book Cover */}
             <div className="order-2 lg:order-1">
-              <div className="max-w-md mx-auto">
+              <div className="max-w-md mx-auto relative">
+                {/* Solid background to replace transparency */}
+                <div className="absolute inset-0 bg-white rounded-lg" />
                 <Image
-                  src="/images/cover.jpg"
+                  src="/images/cover.png"
                   alt="Designed to Fail book cover showing American flag fragmenting over the Capitol building with citizens looking on"
                   width={600}
                   height={900}
-                  className="rounded-lg shadow-hard w-full h-auto"
+                  className="rounded-lg shadow-hard w-full h-auto relative z-10"
                   priority
+                  unoptimized
+                  style={{ backgroundColor: '#ffffff' }}
                 />
               </div>
             </div>

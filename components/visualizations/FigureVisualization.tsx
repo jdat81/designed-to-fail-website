@@ -1,6 +1,8 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import Image from 'next/image'
+import { getFigureBySlug } from '@/lib/content/figures'
 
 // Dynamic imports for visualization components
 const TrustDeclineChart = dynamic(() => import('./TrustDeclineChart'), {
@@ -18,6 +20,31 @@ const TerritoryTimeline = dynamic(() => import('./TerritoryTimeline'), {
   ssr: false,
 })
 
+const HousingBubbleChart = dynamic(() => import('./HousingBubbleChart'), {
+  loading: () => <VisualizationPlaceholder />,
+  ssr: false,
+})
+
+const WalmartGrowthChart = dynamic(() => import('./WalmartGrowthChart'), {
+  loading: () => <VisualizationPlaceholder />,
+  ssr: false,
+})
+
+const WealthDistributionChart = dynamic(() => import('./WealthDistributionChart'), {
+  loading: () => <VisualizationPlaceholder />,
+  ssr: false,
+})
+
+const MineralOutputChart = dynamic(() => import('./MineralOutputChart'), {
+  loading: () => <VisualizationPlaceholder />,
+  ssr: false,
+})
+
+const StateHomePricesChart = dynamic(() => import('./StateHomePricesChart'), {
+  loading: () => <VisualizationPlaceholder />,
+  ssr: false,
+})
+
 function VisualizationPlaceholder() {
   return (
     <div className="aspect-[16/10] bg-gradient-to-br from-neutral-100 to-neutral-200 rounded-xl flex items-center justify-center">
@@ -29,7 +56,26 @@ function VisualizationPlaceholder() {
   )
 }
 
-function DefaultVisualization() {
+function DefaultVisualization({ slug }: { slug: string }) {
+  const figure = getFigureBySlug(slug)
+
+  if (figure?.image) {
+    return (
+      <div className="bg-white rounded-xl p-4 lg:p-8 relative">
+        <div className="relative w-full" style={{ minHeight: '400px' }}>
+          <Image
+            src={figure.image}
+            alt={figure.caption}
+            fill
+            className="object-contain"
+            sizes="(max-width: 768px) 100vw, 800px"
+            unoptimized
+          />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="aspect-[16/10] bg-gradient-to-br from-neutral-100 to-neutral-200 rounded-xl flex items-center justify-center relative overflow-hidden">
       <div className="text-center p-8">
@@ -40,34 +86,33 @@ function DefaultVisualization() {
           Interactive visualization coming soon
         </p>
       </div>
-      {/* Decorative elements */}
-      <div className="absolute top-4 right-4 flex gap-2">
-        <button className="p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
-          <svg className="w-5 h-5 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-          </svg>
-        </button>
-        <button className="p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
-          <svg className="w-5 h-5 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
-          </svg>
-        </button>
-      </div>
     </div>
   )
 }
 
 // Map figure slugs to visualization components
 const visualizationMap: Record<string, React.ComponentType> = {
+  // Trust decline
   '8-1-trust-decline': TrustDeclineChart,
+  // Income inequality
   '9-1-mean-income': IncomeInequalityChart,
   '9-2-share-income': IncomeInequalityChart,
   '9-3-wealth-share': IncomeInequalityChart,
-  '11-4-income-share': IncomeInequalityChart,
+  // Territory maps
   '5-1-territories-1770': TerritoryTimeline,
   '5-2-territories-1800': TerritoryTimeline,
   '5-3-territories-1809': TerritoryTimeline,
   '5-4-territories-1850': TerritoryTimeline,
+  // Minerals
+  '5-5-minerals-1913': MineralOutputChart,
+  // Walmart growth
+  '10-1-wal-growth': WalmartGrowthChart,
+  // Housing bubble
+  '11-1-national-home-prices': HousingBubbleChart,
+  '11-2-state-home-prices': StateHomePricesChart,
+  // Wealth distribution / income share
+  '11-3-wealth-distribution-2025': WealthDistributionChart,
+  '11-4-income-share': WealthDistributionChart,
 }
 
 interface FigureVisualizationProps {
@@ -87,7 +132,7 @@ export default function FigureVisualization({ slug }: FigureVisualizationProps) 
 
   return (
     <div className="max-w-4xl mx-auto mb-12">
-      <DefaultVisualization />
+      <DefaultVisualization slug={slug} />
     </div>
   )
 }

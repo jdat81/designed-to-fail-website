@@ -2,27 +2,11 @@
 
 import { useRef } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { motion, useInView } from 'framer-motion'
 import { cn } from '@/lib/utils/cn'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
-
-const authors = [
-  {
-    name: 'Sven Steinmo',
-    role: 'Political Scientist',
-    years: '1953–2024',
-    bio: 'One of the most influential political scientists of his generation. Steinmo coined the term "historical institutionalism" and transformed how we understand the relationship between institutions and political outcomes.',
-    slug: 'sven-steinmo',
-    isMemorial: true,
-  },
-  {
-    name: 'John D\'Attoma',
-    role: 'Political Scientist',
-    bio: 'Specializing in comparative politics, political economy, and experimental methods. D\'Attoma completed this manuscript after Steinmo\'s passing, carrying forward their shared vision.',
-    slug: 'john-dattoma',
-    isMemorial: false,
-  },
-]
+import { authors } from '@/lib/content/authors'
 
 const cardVariants = {
   hidden: { opacity: 0, y: 30 },
@@ -51,15 +35,25 @@ function AuthorCard({ author, index }: { author: typeof authors[0]; index: numbe
     >
       <Link href={`/authors/${author.slug}`}>
         <div className="card-hover card-lift group h-full">
-          {/* Image Placeholder */}
+          {/* Author Image */}
           <div className="aspect-[4/3] bg-gradient-to-br from-primary-500 to-primary-700 relative overflow-hidden">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-24 h-24 rounded-full bg-white/20 flex items-center justify-center">
-                <svg className="w-12 h-12 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
+            {author.image ? (
+              <Image
+                src={author.image}
+                alt={`${author.name} - ${author.role}`}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-24 h-24 rounded-full bg-white/20 flex items-center justify-center">
+                  <svg className="w-12 h-12 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
               </div>
-            </div>
+            )}
             {author.isMemorial && (
               <div className="absolute top-4 left-4">
                 <span className="px-3 py-1 bg-secondary-500 text-primary-500 text-xs font-semibold rounded-full">
@@ -83,7 +77,7 @@ function AuthorCard({ author, index }: { author: typeof authors[0]; index: numbe
               </p>
             )}
             <p className="text-body text-neutral-600 line-clamp-3">
-              {author.bio}
+              {author.shortBio}
             </p>
           </div>
         </div>

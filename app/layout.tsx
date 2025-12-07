@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     description: 'A groundbreaking analysis examining how constitutional design creates American political dysfunction.',
     images: [
       {
-        url: '/images/cover.jpg',
+        url: '/images/cover.png',
         width: 600,
         height: 900,
         alt: 'Designed to Fail Book Cover - American flag fragmenting over Capitol building',
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Designed to Fail',
     description: 'The system isn\'t broken—it was designed this way.',
-    images: ['/images/cover.jpg'],
+    images: ['/images/cover.png'],
   },
   robots: {
     index: true,
