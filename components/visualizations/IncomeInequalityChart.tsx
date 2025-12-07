@@ -13,10 +13,10 @@ const incomeData = [
 ]
 
 const colors = {
-  top5: '#8B0000',
-  top20: '#C9A227',
-  middle60: '#1A1A2E',
-  bottom20: '#6B7280',
+  top5: '#dc2626',      // Vibrant red
+  top20: '#f97316',     // Orange
+  middle60: '#3b82f6',  // Blue
+  bottom20: '#8b5cf6',  // Purple
 }
 
 export default function IncomeInequalityChart() {
@@ -63,12 +63,12 @@ export default function IncomeInequalityChart() {
   }, [isVisible, animationProgress])
 
   const chartWidth = 700
-  const chartHeight = 350
-  const padding = { top: 30, right: 20, bottom: 60, left: 60 }
+  const chartHeight = 400
+  const padding = { top: 50, right: 30, bottom: 70, left: 60 }
   const innerWidth = chartWidth - padding.left - padding.right
   const innerHeight = chartHeight - padding.top - padding.bottom
 
-  const barWidth = innerWidth / incomeData.length - 10
+  const barWidth = innerWidth / incomeData.length - 20
 
   return (
     <div ref={chartRef} className="w-full">
@@ -102,15 +102,17 @@ export default function IncomeInequalityChart() {
 
         {/* Stacked bars */}
         {incomeData.map((d, i) => {
-          const x = padding.left + (i / incomeData.length) * innerWidth + 5
+          const x = padding.left + (i / incomeData.length) * innerWidth + 10
           let y = padding.top + innerHeight
 
           const segments = [
-            { key: 'bottom20', value: d.bottom20, color: colors.bottom20 },
-            { key: 'middle60', value: d.middle60, color: colors.middle60 },
-            { key: 'top20', value: d.top20 - d.top5, color: colors.top20 },
-            { key: 'top5', value: d.top5, color: colors.top5 },
+            { key: 'bottom20', value: d.bottom20, color: colors.bottom20, label: 'Bottom 20%' },
+            { key: 'middle60', value: d.middle60, color: colors.middle60, label: 'Middle 60%' },
+            { key: 'top20', value: d.top20 - d.top5, color: colors.top20, label: 'Top 15-20%' },
+            { key: 'top5', value: d.top5, color: colors.top5, label: 'Top 5%' },
           ]
+
+          const isHovered = hoveredBar === i
 
           return (
             <g
@@ -130,17 +132,22 @@ export default function IncomeInequalityChart() {
                     width={barWidth}
                     height={height}
                     fill={seg.color}
-                    opacity={hoveredBar === null || hoveredBar === i ? 1 : 0.5}
-                    className="transition-opacity duration-200"
+                    rx={2}
+                    opacity={hoveredBar === null || isHovered ? 1 : 0.4}
+                    className="transition-all duration-200"
+                    style={{
+                      transform: isHovered ? 'scale(1.02)' : 'scale(1)',
+                      transformOrigin: 'center bottom',
+                    }}
                   />
                 )
               })}
               {/* Year label */}
               <text
                 x={x + barWidth / 2}
-                y={chartHeight - padding.bottom + 20}
+                y={chartHeight - padding.bottom + 25}
                 textAnchor="middle"
-                className="fill-neutral-500 text-xs"
+                className={`text-sm font-semibold transition-colors ${isHovered ? 'fill-primary-500' : 'fill-neutral-500'}`}
               >
                 {d.year}
               </text>
@@ -151,56 +158,94 @@ export default function IncomeInequalityChart() {
         {/* Title */}
         <text
           x={chartWidth / 2}
-          y={15}
+          y={25}
           textAnchor="middle"
-          className="fill-primary-500 font-serif text-sm font-semibold"
+          className="fill-primary-500 font-serif text-base font-semibold"
         >
           Share of Total U.S. Household Income (1968-2023)
+        </text>
+
+        {/* Y-axis label */}
+        <text
+          x={-chartHeight / 2 + 20}
+          y={18}
+          transform="rotate(-90)"
+          textAnchor="middle"
+          className="fill-neutral-500 text-xs"
+        >
+          Percent of Total Income
         </text>
       </svg>
 
       {/* Legend */}
-      <div className="flex flex-wrap justify-center gap-6 mt-4 text-sm">
-        <div className="flex items-center gap-2">
-          <span className="w-4 h-4 rounded" style={{ backgroundColor: colors.top5 }}></span>
-          <span className="text-neutral-600">Top 5%</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="w-4 h-4 rounded" style={{ backgroundColor: colors.top20 }}></span>
-          <span className="text-neutral-600">Top 20% (excl. top 5%)</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="w-4 h-4 rounded" style={{ backgroundColor: colors.middle60 }}></span>
-          <span className="text-neutral-600">Middle 60%</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="w-4 h-4 rounded" style={{ backgroundColor: colors.bottom20 }}></span>
-          <span className="text-neutral-600">Bottom 20%</span>
-        </div>
+      <div className="flex flex-wrap justify-center gap-4 mt-4">
+        {[
+          { key: 'top5', label: 'Top 5%', color: colors.top5 },
+          { key: 'top20', label: 'Top 15-20%', color: colors.top20 },
+          { key: 'middle60', label: 'Middle 60%', color: colors.middle60 },
+          { key: 'bottom20', label: 'Bottom 20%', color: colors.bottom20 },
+        ].map(item => (
+          <div key={item.key} className="flex items-center gap-2">
+            <span
+              className="w-4 h-4 rounded-sm"
+              style={{ backgroundColor: item.color }}
+            />
+            <span className="text-neutral-600 text-sm font-medium">{item.label}</span>
+          </div>
+        ))}
       </div>
 
-      {/* Hover tooltip */}
+      {/* Hover details */}
       {hoveredBar !== null && (
-        <div className="mt-4 p-4 bg-neutral-50 rounded-lg text-sm">
-          <div className="font-semibold text-primary-500 mb-2">{incomeData[hoveredBar].year}</div>
-          <div className="grid grid-cols-2 gap-2">
-            <span className="text-neutral-600">Top 5%:</span>
-            <span className="font-semibold">{incomeData[hoveredBar].top5}%</span>
-            <span className="text-neutral-600">Top 20%:</span>
-            <span className="font-semibold">{incomeData[hoveredBar].top20}%</span>
-            <span className="text-neutral-600">Middle 60%:</span>
-            <span className="font-semibold">{incomeData[hoveredBar].middle60}%</span>
-            <span className="text-neutral-600">Bottom 20%:</span>
-            <span className="font-semibold">{incomeData[hoveredBar].bottom20}%</span>
+        <div className="mt-4 p-5 bg-gradient-to-r from-slate-50 to-slate-100 rounded-xl">
+          <div className="font-bold text-xl text-primary-500 mb-3">{incomeData[hoveredBar].year}</div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold" style={{ color: colors.top5 }}>{incomeData[hoveredBar].top5}%</div>
+              <div className="text-xs text-neutral-500">Top 5%</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold" style={{ color: colors.top20 }}>{(incomeData[hoveredBar].top20 - incomeData[hoveredBar].top5).toFixed(1)}%</div>
+              <div className="text-xs text-neutral-500">Top 15-20%</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold" style={{ color: colors.middle60 }}>{incomeData[hoveredBar].middle60}%</div>
+              <div className="text-xs text-neutral-500">Middle 60%</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold" style={{ color: colors.bottom20 }}>{incomeData[hoveredBar].bottom20}%</div>
+              <div className="text-xs text-neutral-500">Bottom 20%</div>
+            </div>
           </div>
         </div>
       )}
 
+      {/* Key Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+        <div className="bg-red-50 rounded-lg p-4 text-center border-t-4 border-red-500">
+          <div className="text-2xl font-bold text-red-600">+39%</div>
+          <div className="text-sm text-neutral-600">Top 5% Growth</div>
+        </div>
+        <div className="bg-orange-50 rounded-lg p-4 text-center border-t-4 border-orange-500">
+          <div className="text-2xl font-bold text-orange-600">+23%</div>
+          <div className="text-sm text-neutral-600">Top 20% Growth</div>
+        </div>
+        <div className="bg-blue-50 rounded-lg p-4 text-center border-t-4 border-blue-500">
+          <div className="text-2xl font-bold text-blue-600">-17%</div>
+          <div className="text-sm text-neutral-600">Middle 60% Decline</div>
+        </div>
+        <div className="bg-purple-50 rounded-lg p-4 text-center border-t-4 border-purple-500">
+          <div className="text-2xl font-bold text-purple-600">-29%</div>
+          <div className="text-sm text-neutral-600">Bottom 20% Decline</div>
+        </div>
+      </div>
+
       {/* Key insight */}
-      <div className="mt-6 p-4 bg-secondary-500/10 rounded-lg border-l-4 border-secondary-500">
+      <div className="mt-6 p-4 bg-gradient-to-r from-red-50 to-orange-50 rounded-lg border-l-4 border-red-500">
         <p className="text-neutral-700 text-sm">
-          <strong>Growing concentration:</strong> The top 5% share grew from 17.4% in 1968 to 24.2% in 2023,
-          while the middle 60% share declined from 52.3% to 43.5%.
+          <strong>The Great Divergence:</strong> Since 1968, the top 5%&apos;s share of income grew from 17.4% to 24.2%,
+          while the middle class share shrank from 52.3% to 43.5%. The American Dream of shared prosperity has
+          given way to winner-take-all economics.
         </p>
       </div>
     </div>

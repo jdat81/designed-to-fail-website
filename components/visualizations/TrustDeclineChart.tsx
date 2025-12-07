@@ -17,6 +17,7 @@ const trustData = [
 export default function TrustDeclineChart() {
   const [isVisible, setIsVisible] = useState(false)
   const [animationProgress, setAnimationProgress] = useState(0)
+  const [hoveredPoint, setHoveredPoint] = useState<number | null>(null)
   const chartRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -44,7 +45,6 @@ export default function TrustDeclineChart() {
       const animate = () => {
         const elapsed = Date.now() - startTime
         const progress = Math.min(elapsed / duration, 1)
-        // Easing function
         const eased = 1 - Math.pow(1 - progress, 3)
         setAnimationProgress(eased)
 
@@ -57,16 +57,16 @@ export default function TrustDeclineChart() {
     }
   }, [isVisible, animationProgress])
 
-  const chartWidth = 600
-  const chartHeight = 300
-  const padding = { top: 20, right: 30, bottom: 40, left: 50 }
+  const chartWidth = 700
+  const chartHeight = 400
+  const padding = { top: 50, right: 40, bottom: 60, left: 60 }
   const innerWidth = chartWidth - padding.left - padding.right
   const innerHeight = chartHeight - padding.top - padding.bottom
 
-  const minYear = Math.min(...trustData.map(d => d.year))
-  const maxYear = Math.max(...trustData.map(d => d.year))
+  const minYear = 1958
+  const maxYear = 1978
   const minTrust = 20
-  const maxTrust = 80
+  const maxTrust = 85
 
   const xScale = (year: number) =>
     padding.left + ((year - minYear) / (maxYear - minYear)) * innerWidth
@@ -74,17 +74,32 @@ export default function TrustDeclineChart() {
   const yScale = (trust: number) =>
     padding.top + innerHeight - ((trust - minTrust) / (maxTrust - minTrust)) * innerHeight
 
+  // Create area path
+  const areaPath = trustData
+    .map((d, i) => {
+      const x = xScale(d.year)
+      const animatedTrust = minTrust + (d.trust - minTrust) * animationProgress
+      const y = yScale(animatedTrust)
+      return `${i === 0 ? 'M' : 'L'} ${x} ${y}`
+    })
+    .join(' ') + ` L ${xScale(1978)} ${yScale(minTrust)} L ${xScale(1958)} ${yScale(minTrust)} Z`
+
   // Create line path
   const linePath = trustData
     .map((d, i) => {
       const x = xScale(d.year)
-      const y = yScale(d.trust)
+      const animatedTrust = minTrust + (d.trust - minTrust) * animationProgress
+      const y = yScale(animatedTrust)
       return `${i === 0 ? 'M' : 'L'} ${x} ${y}`
     })
     .join(' ')
 
-  // Calculate path length for animation
-  const pathLength = 1000 // Approximate
+  // Key events
+  const events = [
+    { year: 1963, label: 'JFK Assassination', y: 70 },
+    { year: 1968, label: 'MLK/RFK Killed', y: 58 },
+    { year: 1974, label: 'Nixon Resigns', y: 33 },
+  ]
 
   return (
     <div ref={chartRef} className="w-full">
@@ -93,7 +108,15 @@ export default function TrustDeclineChart() {
         className="w-full h-auto"
         style={{ maxWidth: chartWidth }}
       >
-        {/* Grid lines */}
+        {/* Gradient definition */}
+        <defs>
+          <linearGradient id="trustGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#ef4444" stopOpacity={0.4} />
+            <stop offset="100%" stopColor="#ef4444" stopOpacity={0.05} />
+          </linearGradient>
+        </defs>
+
+        {/* Y-axis gridlines */}
         {[20, 40, 60, 80].map(value => (
           <g key={value}>
             <line
@@ -105,7 +128,7 @@ export default function TrustDeclineChart() {
               strokeDasharray="4 4"
             />
             <text
-              x={padding.left - 10}
+              x={padding.left - 12}
               y={yScale(value)}
               textAnchor="end"
               dominantBaseline="middle"
@@ -117,11 +140,11 @@ export default function TrustDeclineChart() {
         ))}
 
         {/* X-axis labels */}
-        {trustData.filter((_, i) => i % 2 === 0).map(d => (
+        {trustData.map(d => (
           <text
             key={d.year}
             x={xScale(d.year)}
-            y={chartHeight - padding.bottom + 20}
+            y={chartHeight - padding.bottom + 25}
             textAnchor="middle"
             className="fill-neutral-400 text-xs"
           >
@@ -129,45 +152,88 @@ export default function TrustDeclineChart() {
           </text>
         ))}
 
-        {/* Animated line */}
+        {/* Event markers */}
+        {events.map((event, i) => (
+          <g key={i} style={{ opacity: animationProgress > 0.5 ? 1 : 0 }}>
+            <line
+              x1={xScale(event.year)}
+              y1={yScale(event.y) - 5}
+              x2={xScale(event.year)}
+              y2={yScale(minTrust)}
+              stroke="#f97316"
+              strokeWidth={1}
+              strokeDasharray="4 4"
+              opacity={0.5}
+            />
+            <text
+              x={xScale(event.year)}
+              y={yScale(event.y) - 15}
+              textAnchor="middle"
+              className="fill-orange-500 text-[10px] font-semibold"
+            >
+              {event.label}
+            </text>
+          </g>
+        ))}
+
+        {/* Area fill */}
+        <path
+          d={areaPath}
+          fill="url(#trustGradient)"
+        />
+
+        {/* Line */}
         <path
           d={linePath}
           fill="none"
-          stroke="#8B0000"
+          stroke="#ef4444"
           strokeWidth={3}
           strokeLinecap="round"
           strokeLinejoin="round"
-          strokeDasharray={pathLength}
-          strokeDashoffset={pathLength * (1 - animationProgress)}
-          style={{ transition: 'stroke-dashoffset 0.1s ease-out' }}
         />
 
         {/* Data points */}
         {trustData.map((d, i) => {
-          const pointProgress = Math.max(0, (animationProgress * trustData.length - i) / 1)
-          const opacity = Math.min(1, pointProgress)
-          const scale = Math.min(1, pointProgress)
-
+          const isHovered = hoveredPoint === i
+          const animatedTrust = minTrust + (d.trust - minTrust) * animationProgress
           return (
-            <g key={d.year} style={{ opacity }}>
+            <g
+              key={d.year}
+              onMouseEnter={() => setHoveredPoint(i)}
+              onMouseLeave={() => setHoveredPoint(null)}
+              style={{ cursor: 'pointer' }}
+            >
               <circle
                 cx={xScale(d.year)}
-                cy={yScale(d.trust)}
-                r={6 * scale}
-                fill="#8B0000"
+                cy={yScale(animatedTrust)}
+                r={isHovered ? 10 : 6}
+                fill="#ef4444"
+                stroke="white"
+                strokeWidth={3}
                 className="transition-all duration-200"
               />
-              {/* Labels for first and last */}
-              {(i === 0 || i === trustData.length - 1) && (
-                <text
-                  x={xScale(d.year)}
-                  y={yScale(d.trust) - 15}
-                  textAnchor="middle"
-                  className="fill-primary-500 font-bold text-sm"
-                  style={{ opacity: scale }}
-                >
-                  {d.trust}%
-                </text>
+              {/* Always show first and last labels */}
+              {(i === 0 || i === trustData.length - 1 || isHovered) && (
+                <g>
+                  <rect
+                    x={xScale(d.year) - 28}
+                    y={yScale(animatedTrust) - 35}
+                    width={56}
+                    height={24}
+                    fill="white"
+                    stroke="#ef4444"
+                    strokeWidth={1}
+                    rx={4}
+                  />
+                  <text
+                    x={xScale(d.year)}
+                    y={yScale(animatedTrust) - 19}
+                    textAnchor="middle"
+                    className="fill-red-600 font-bold text-sm"
+                  >
+                    {Math.round(animatedTrust)}%
+                  </text>
+                </g>
               )}
             </g>
           )
@@ -176,27 +242,47 @@ export default function TrustDeclineChart() {
         {/* Title */}
         <text
           x={chartWidth / 2}
-          y={15}
+          y={25}
           textAnchor="middle"
-          className="fill-primary-500 font-serif text-sm font-semibold"
+          className="fill-primary-500 font-serif text-base font-semibold"
         >
-          Trust in Government (1958-1978)
+          The Collapse of Trust in Government (1958-1978)
+        </text>
+
+        {/* Y-axis label */}
+        <text
+          x={-chartHeight / 2}
+          y={20}
+          transform="rotate(-90)"
+          textAnchor="middle"
+          className="fill-neutral-500 text-xs"
+        >
+          % Trusting Government
         </text>
       </svg>
 
-      {/* Legend */}
-      <div className="flex justify-center gap-8 mt-4 text-sm">
-        <div className="flex items-center gap-2">
-          <span className="w-4 h-1 bg-accent-red rounded"></span>
-          <span className="text-neutral-600">% Trusting Government &quot;Most of the Time&quot;</span>
+      {/* Key Stats */}
+      <div className="grid grid-cols-3 gap-4 mt-6">
+        <div className="bg-red-50 rounded-lg p-4 text-center">
+          <div className="text-3xl font-bold text-red-600">73%</div>
+          <div className="text-sm text-neutral-600">1958 Peak</div>
+        </div>
+        <div className="bg-red-50 rounded-lg p-4 text-center">
+          <div className="text-3xl font-bold text-red-600">30%</div>
+          <div className="text-sm text-neutral-600">1978 Low</div>
+        </div>
+        <div className="bg-red-50 rounded-lg p-4 text-center">
+          <div className="text-3xl font-bold text-red-600">-43pts</div>
+          <div className="text-sm text-neutral-600">Total Decline</div>
         </div>
       </div>
 
-      {/* Annotation */}
-      <div className="mt-6 p-4 bg-accent-red/5 rounded-lg border-l-4 border-accent-red">
+      {/* Key insight */}
+      <div className="mt-6 p-4 bg-red-50 rounded-lg border-l-4 border-red-500">
         <p className="text-neutral-700 text-sm">
-          <strong>-43 percentage points</strong> — Trust in government collapsed from 73% in 1958 to 30% in 1978,
-          a dramatic shift that fundamentally changed American political culture.
+          <strong>A Generation of Disillusionment:</strong> Trust in government collapsed by 43 percentage points
+          in just 20 years—driven by Vietnam, Watergate, assassinations, and civil unrest. This erosion of faith
+          fundamentally reshaped American political culture and continues to shape our democracy today.
         </p>
       </div>
     </div>
