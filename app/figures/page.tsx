@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { figures } from '@/lib/content/figures'
 import { cn } from '@/lib/utils/cn'
+import FigureThumbnail from '@/components/visualizations/FigureThumbnail'
 
 const themes = [
   { id: 'all', label: 'All Figures' },
@@ -73,15 +74,9 @@ export default function FiguresPage() {
             {filteredFigures.map((figure) => (
               <Link key={figure.slug} href={`/figures/${figure.slug}`}>
                 <div className="card-hover group h-full">
-                  {/* Figure Image */}
+                  {/* Figure Thumbnail */}
                   <div className="aspect-[4/3] bg-white relative overflow-hidden">
-                    <Image
-                      src={figure.image}
-                      alt={figure.caption}
-                      fill
-                      className="object-contain p-2"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    />
+                    <FigureThumbnail figure={figure} />
                     {/* Theme Badge */}
                     <div className="absolute top-4 left-4 z-10">
                       <span className={cn(

@@ -41,7 +41,7 @@ export default function TrustDeclineChart() {
       <p className="text-center text-sm text-neutral-500 mb-6">% who trust the federal government &apos;just about always&apos; or &apos;most of the time&apos;</p>
 
       {/* Chart */}
-      <div className="relative h-80 bg-gradient-to-b from-orange-50 to-white rounded-xl p-6 overflow-visible">
+      <div className="relative h-80 bg-gradient-to-b from-slate-100 to-white rounded-xl p-6 overflow-visible">
         {/* Y-axis labels */}
         <div className="absolute left-0 top-12 bottom-12 w-12 flex flex-col justify-between text-right pr-2">
           <span className="text-xs text-neutral-400">80%</span>
@@ -61,7 +61,7 @@ export default function TrustDeclineChart() {
                 y1={y}
                 x2="400"
                 y2={y}
-                stroke="#fed7aa"
+                stroke="#cbd5e1"
                 strokeDasharray="4 4"
               />
             ))}
@@ -69,8 +69,8 @@ export default function TrustDeclineChart() {
             {/* Area under line */}
             <defs>
               <linearGradient id="trustAreaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#f97316" stopOpacity="0.4" />
-                <stop offset="100%" stopColor="#f97316" stopOpacity="0.05" />
+                <stop offset="0%" stopColor="#1e3a5f" stopOpacity="0.4" />
+                <stop offset="100%" stopColor="#1e3a5f" stopOpacity="0.05" />
               </linearGradient>
             </defs>
 
@@ -102,7 +102,7 @@ export default function TrustDeclineChart() {
                 }).join(' ')}
               `}
               fill="none"
-              stroke="#f97316"
+              stroke="#1e3a5f"
               strokeWidth="3"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -122,7 +122,7 @@ export default function TrustDeclineChart() {
                     cx={x}
                     cy={y}
                     r={isHovered ? 10 : isEndpoint ? 8 : 5}
-                    fill="#f97316"
+                    fill="#1e3a5f"
                     stroke="white"
                     strokeWidth="3"
                     className="transition-all duration-200 cursor-pointer"
@@ -139,14 +139,14 @@ export default function TrustDeclineChart() {
                         height="24"
                         rx="4"
                         fill="white"
-                        stroke="#f97316"
+                        stroke="#1e3a5f"
                         strokeWidth="1"
                       />
                       <text
                         x={x}
                         y={y - 19}
                         textAnchor="middle"
-                        className="text-sm font-bold fill-orange-600"
+                        className="text-sm font-bold fill-slate-600"
                       >
                         {d.trust}%
                       </text>
@@ -168,25 +168,25 @@ export default function TrustDeclineChart() {
         {/* Tooltip */}
         {hoveredIndex !== null && (
           <div
-            className="absolute px-3 py-2 bg-white border border-orange-200 rounded-lg shadow-lg z-10 pointer-events-none"
+            className="absolute px-3 py-2 bg-white border border-slate-200 rounded-lg shadow-lg z-10 pointer-events-none"
             style={{
               left: `calc(3rem + ${(hoveredIndex / (trustData.length - 1)) * 100}% - 40px)`,
               bottom: '3rem'
             }}
           >
-            <div className="font-bold text-orange-600">{trustData[hoveredIndex].year}</div>
+            <div className="font-bold text-slate-600">{trustData[hoveredIndex].year}</div>
             <div className="text-sm text-neutral-600">{trustData[hoveredIndex].trust}% trust</div>
           </div>
         )}
       </div>
 
       {/* Key Events Timeline */}
-      <div className="mt-6 bg-orange-50 rounded-xl p-4">
-        <h4 className="font-semibold text-orange-800 mb-3 text-sm">Key Events</h4>
+      <div className="mt-6 bg-slate-50 rounded-xl p-4">
+        <h4 className="font-semibold text-slate-800 mb-3 text-sm">Key Events</h4>
         <div className="flex justify-around">
           {keyEvents.map(event => (
             <div key={event.year} className="text-center">
-              <div className="text-lg font-bold text-orange-600">{event.year}</div>
+              <div className="text-lg font-bold text-slate-600">{event.year}</div>
               <div className="text-xs text-neutral-600">{event.label}</div>
             </div>
           ))}
@@ -195,22 +195,22 @@ export default function TrustDeclineChart() {
 
       {/* Key Stats */}
       <div className="grid grid-cols-3 gap-4 mt-6">
-        <div className="bg-orange-50 rounded-xl p-4 text-center border-t-4 border-orange-400">
-          <div className="text-3xl font-bold text-orange-600">73%</div>
+        <div className="bg-slate-50 rounded-xl p-4 text-center border-t-4 border-slate-400">
+          <div className="text-3xl font-bold text-slate-600">73%</div>
           <div className="text-sm text-neutral-600">1958 Peak</div>
         </div>
-        <div className="bg-orange-50 rounded-xl p-4 text-center border-t-4 border-orange-500">
-          <div className="text-3xl font-bold text-orange-700">30%</div>
+        <div className="bg-slate-50 rounded-xl p-4 text-center border-t-4 border-slate-500">
+          <div className="text-3xl font-bold text-slate-700">30%</div>
           <div className="text-sm text-neutral-600">1978 Low</div>
         </div>
-        <div className="bg-orange-50 rounded-xl p-4 text-center border-t-4 border-orange-600">
-          <div className="text-3xl font-bold text-orange-800">-43pts</div>
+        <div className="bg-slate-50 rounded-xl p-4 text-center border-t-4 border-slate-600">
+          <div className="text-3xl font-bold text-slate-800">-43pts</div>
           <div className="text-sm text-neutral-600">Total Decline</div>
         </div>
       </div>
 
       {/* Key insight */}
-      <div className="mt-6 p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg border-l-4 border-orange-500">
+      <div className="mt-6 p-4 bg-gradient-to-r from-amber-50 to-slate-50 rounded-lg border-l-4 border-slate-500">
         <p className="text-neutral-700 text-sm">
           <strong>A Generation of Disillusionment:</strong> Trust in government collapsed by 43 percentage points
           in just 20 years—driven by Vietnam, Watergate, assassinations, and civil unrest. This erosion of faith
