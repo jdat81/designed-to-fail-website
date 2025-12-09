@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Figure Preview - Designed to Fail</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+      min-height: 100vh;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      max-width: 1200px;
+      margin: 0 auto 40px;
+    }
+
+    header h1 {
+      margin: 0 0 10px;
+      color: #1a1a2e;
+      font-size: 2rem;
+    }
+
+    header p {
+      margin: 0;
+      color: #666;
+      font-size: 1rem;
+    }
+
+    .palette-info {
+      margin-top: 15px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+
+    .palette-info h3 {
+      margin: 0 0 10px;
+      font-size: 0.9rem;
+      color: #333;
+    }
+
+    .color-swatches {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .swatch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .swatch-color {
+      width: 40px;
+      height: 40px;
+      border-radius: 6px;
+      border: 2px solid white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    }
+
+    .swatch-label {
+      font-size: 10px;
+      color: #666;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+      gap: 24px;
+      max-width: 1800px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    }
+
+    .card-image {
+      position: relative;
+      background: #fafafa;
+      padding: 10px;
+    }
+
+    .card-image img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 4px;
+    }
+
+    .card-badge {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(26, 26, 46, 0.9);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .card-content {
+      padding: 20px;
+    }
+
+    .card-content h3 {
+      margin: 0 0 8px;
+      font-size: 1.1rem;
+      color: #1a1a2e;
+    }
+
+    .card-content p {
+      margin: 0 0 12px;
+      font-size: 0.9rem;
+      color: #666;
+      line-height: 1.5;
+    }
+
+    .card-meta {
+      display: flex;
+      gap: 16px;
+      font-size: 0.75rem;
+      color: #999;
+    }
+
+    .card-meta span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .status-enhanced {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      padding: 20px;
+      color: #666;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 600px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      header h1 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Figure Preview - Enhanced Color Schemes</h1>
+    <p>Publication-quality visualizations with Okabe-Ito colorblind-friendly palette and Viridis scale</p>
+
+    <div class="palette-info">
+      <h3>Okabe-Ito Colorblind-Friendly Palette</h3>
+      <div class="color-swatches">
+        <div class="swatch">
+          <div class="swatch-color" style="background: #E69F00"></div>
+          <span class="swatch-label">Orange</span>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: #56B4E9"></div>
+          <span class="swatch-label">Sky Blue</span>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: #009E73"></div>
+          <span class="swatch-label">Green</span>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: #F0E442"></div>
+          <span class="swatch-label">Yellow</span>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: #0072B2"></div>
+          <span class="swatch-label">Blue</span>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: #D55E00"></div>
+          <span class="swatch-label">Vermilion</span>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: #CC79A7"></div>
+          <span class="swatch-label">Purple</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid" id="figures"></div>
+
+  <footer>
+    <p>Generated: December 7, 2025 | Script: generate_enhanced_figures.R</p>
+    <p>Open this file directly in a browser to preview figures without running the dev server.</p>
+  </footer>
+
+  <script>
+    const figures = [
+      {
+        file: '5-1-territories-1770.png',
+        number: '5.1',
+        title: 'American Territories, 1775',
+        desc: 'Original Thirteen Colonies shown in blue, British territories in sky blue, foreign areas in gray.',
+        chapter: 'Chapter 5',
+        palette: 'Okabe-Ito'
+      },
+      {
+        file: '5-2-territories-1800.png',
+        number: '5.2',
+        title: 'American Territories, 1800',
+        desc: 'Free states (blue), slave states (vermilion), free territories (sky blue), slave territories (orange).',
+        chapter: 'Chapter 5',
+        palette: 'Okabe-Ito'
+      },
+      {
+        file: '5-3-territories-1809.png',
+        number: '5.3',
+        title: 'American Territories, 1809',
+        desc: 'Post-Louisiana Purchase expansion. States in blue, territories in green.',
+        chapter: 'Chapter 5',
+        palette: 'Okabe-Ito'
+      },
+      {
+        file: '5-4-territories-1850.png',
+        number: '5.4',
+        title: 'American Territories, 1850',
+        desc: 'Continental expansion complete. 31 states in blue, western territories in orange.',
+        chapter: 'Chapter 5',
+        palette: 'Okabe-Ito'
+      },
+      {
+        file: '5-5-minerals-1913.png',
+        number: '5.5',
+        title: 'U.S. Mineral Production (1913)',
+        desc: 'Horizontal bar chart with Viridis color scale showing America\'s resource dominance.',
+        chapter: 'Chapter 5',
+        palette: 'Viridis'
+      },
+      {
+        file: '8-1-trust-decline.png',
+        number: '8.1',
+        title: 'Trust in Government Decline',
+        desc: 'Line chart with presidential term shading and event annotations. Vermilion line with filled area.',
+        chapter: 'Chapter 8',
+        palette: 'Okabe-Ito'
+      },
+      {
+        file: '9-1-mean-income.png',
+        number: '9.1',
+        title: 'Mean Income by Quintile',
+        desc: 'Multi-line chart showing income divergence from 1968-2023 using Viridis palette.',
+        chapter: 'Chapter 9',
+        palette: 'Viridis'
+      },
+      {
+        file: '9-2-share-income.png',
+        number: '9.2',
+        title: 'Share of Income Distribution',
+        desc: 'Line chart comparing income shares across groups with Okabe-Ito colors.',
+        chapter: 'Chapter 9',
+        palette: 'Okabe-Ito'
+      },
+      {
+        file: '9-3-wealth-share.png',
+        number: '9.3',
+        title: 'Wealth Share by Group',
+        desc: 'Shows extreme wealth concentration: Top 1% (vermilion), Top 10% (orange), Bottom 50% (blue).',
+        chapter: 'Chapter 9',
+        palette: 'Okabe-Ito'
+      },
+      {
+        file: '10-1-wal-growth.png',
+        number: '10.1',
+        title: 'Walmart Growth 1962-2005',
+        desc: 'Area chart showing exponential store count growth from 1 to 6,141.',
+        chapter: 'Chapter 10',
+        palette: 'Okabe-Ito'
+      },
+      {
+        file: '10-2-wal-maps.png',
+        number: '10.2',
+        title: 'Walmart Geographic Expansion',
+        desc: 'Map showing expansion waves from Arkansas origin point in color-coded stages.',
+        chapter: 'Chapter 10',
+        palette: 'Okabe-Ito'
+      },
+      {
+        file: '11-1-national-home-prices.png',
+        number: '11.1',
+        title: 'National Home Price Index',
+        desc: 'Housing bubble visualization with crisis zone shading and peak marker.',
+        chapter: 'Chapter 11',
+        palette: 'Okabe-Ito'
+      },
+      {
+        file: '11-2-state-home-prices.png',
+        number: '11.2',
+        title: 'State Home Price Comparison',
+        desc: 'Top 5 bubble states comparison with distinct colors for each state.',
+        chapter: 'Chapter 11',
+        palette: 'Okabe-Ito'
+      },
+      {
+        file: '11-3-wealth-distribution-2025.png',
+        number: '11.3',
+        title: 'Wealth Distribution 2025',
+        desc: 'Bar chart showing Top 1% (30.3%), Next 9% (36.8%), Next 40% (30.2%), Bottom 50% (2.6%).',
+        chapter: 'Chapter 11',
+        palette: 'Okabe-Ito'
+      },
+      {
+        file: '11-4-income-share.png',
+        number: '11.4',
+        title: 'Income Share by Tier',
+        desc: 'Long-term trend (1970-2022) showing upper tier gains vs middle/lower decline.',
+        chapter: 'Chapter 11',
+        palette: 'Okabe-Ito'
+      }
+    ];
+
+    const container = document.getElementById('figures');
+
+    figures.forEach(fig => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="card-image">
+          <span class="card-badge">Figure ${fig.number}</span>
+          <img src="../public/images/figures/${fig.file}" alt="${fig.title}" loading="lazy" />
+        </div>
+        <div class="card-content">
+          <h3>${fig.title}</h3>
+          <p>${fig.desc}</p>
+          <div class="card-meta">
+            <span>${fig.chapter}</span>
+            <span>Palette: ${fig.palette}</span>
+            <span class="status status-enhanced">Enhanced</span>
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  </script>
+</body>
+</html>

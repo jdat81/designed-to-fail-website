@@ -101,20 +101,6 @@ export default function FigurePage({ params }: FigurePageProps) {
               </p>
             </div>
 
-            {/* Data Source */}
-            <div className="bg-neutral-50 rounded-xl p-6 lg:p-8 mb-12">
-              <h3 className="font-serif text-title text-primary-500 mb-4">
-                Data Source
-              </h3>
-              {figure.source && (
-                <p className="text-body text-neutral-600 mb-4">
-                  {figure.source}
-                </p>
-              )}
-              <p className="text-sm text-neutral-400">
-                Data visualizations in &ldquo;Designed to Fail&rdquo; draw from peer-reviewed research, government statistics, and historical records to document 250 years of institutional impact on American democracy.
-              </p>
-            </div>
 
             {/* Related Chapter */}
             {relatedChapter && (

@@ -38,9 +38,6 @@ export default function FiguresPage() {
               Data &amp;{' '}
               <span className="text-secondary-400">Visualizations</span>
             </h1>
-            <p className="text-body-lg text-white/70">
-              14 figures documenting 250 years of institutional design, territorial expansion, economic transformation, and the collapse of trust in American democracy.
-            </p>
           </div>
         </div>
       </section>

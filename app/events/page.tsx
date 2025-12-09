@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 const upcomingEvents = [
   {
-    date: 'August 2025',
+    date: '2026',
     title: 'Book Launch Event',
     location: 'New Haven, CT',
     venue: 'Yale University',
@@ -17,15 +17,15 @@ const upcomingEvents = [
     description: 'Official launch event hosted by Yale University Press with keynote address by John D\'Attoma.',
   },
   {
-    date: 'September 2025',
+    date: '2026',
     title: 'American Political Science Association Annual Meeting',
-    location: 'Seattle, WA',
+    location: 'TBA',
     venue: 'APSA Conference',
     type: 'Academic',
     description: 'Panel discussion on institutional design and democratic dysfunction.',
   },
   {
-    date: 'Fall 2025',
+    date: '2026',
     title: 'University Lecture Series',
     location: 'Various',
     venue: 'Multiple Universities',

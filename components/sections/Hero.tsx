@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion, useInView } from 'framer-motion'
-import { cn } from '@/lib/utils/cn'
 
 // Animated counter component with framer-motion integration
 function AnimatedCounter({
@@ -45,12 +44,24 @@ function AnimatedCounter({
   return <span ref={ref}>{prefix}{count.toLocaleString()}{suffix}</span>
 }
 
-// Key statistics from the book that drive the narrative
+// Key statistics from the book that drive the narrative - Gallup Confidence in Institutions
 const stats = [
   { number: 73, suffix: '%', label: 'Trusted Gov\'t in 1958', highlight: false },
   { number: 14, suffix: '%', label: 'Trust Gov\'t Today', highlight: true },
-  { number: 250, suffix: '+', label: 'Years of Design', highlight: false },
-  { number: 12, suffix: '', label: 'Critical Chapters', highlight: false },
+  { number: 42, suffix: '%', label: 'Trusted Congress in 1973', highlight: false },
+  { number: 9, suffix: '%', label: 'Trust Congress Today', highlight: true },
+  { number: 56, suffix: '%', label: 'Trusted Supreme Court in 1988', highlight: false },
+  { number: 30, suffix: '%', label: 'Trust Supreme Court Today', highlight: true },
+  { number: 52, suffix: '%', label: 'Trusted Presidency in 1975', highlight: false },
+  { number: 26, suffix: '%', label: 'Trust Presidency Today', highlight: true },
+  { number: 46, suffix: '%', label: 'Trusted TV News in 1993', highlight: false },
+  { number: 11, suffix: '%', label: 'Trust TV News Today', highlight: true },
+  { number: 34, suffix: '%', label: 'Trusted Big Business in 1975', highlight: false },
+  { number: 16, suffix: '%', label: 'Trust Big Business Today', highlight: true },
+  { number: 34, suffix: '%', label: 'Trusted Criminal Justice in 2004', highlight: false },
+  { number: 17, suffix: '%', label: 'Trust Criminal Justice Today', highlight: true },
+  { number: 51, suffix: '%', label: 'Trusted Newspapers in 1979', highlight: false },
+  { number: 17, suffix: '%', label: 'Trust Newspapers Today', highlight: true },
 ]
 
 // Animation variants
@@ -77,17 +88,6 @@ const itemVariants = {
   },
 }
 
-const statsVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.5,
-      ease: [0.25, 0.1, 0.25, 1],
-    },
-  },
-}
 
 export default function Hero() {
   return (
@@ -118,7 +118,7 @@ export default function Hero() {
           >
             <span className="w-2 h-2 rounded-full bg-secondary-400 animate-pulse" />
             <span className="text-white/90 text-sm font-sans font-medium">
-              Yale University Press • August 2025
+              Yale University Press • Forthcoming 2026
             </span>
           </motion.div>
 
@@ -167,34 +167,33 @@ export default function Hero() {
             </Link>
           </motion.div>
 
-          {/* Stats - Conversion Code Style with emphasis on trust decline */}
+          {/* Stats - Institutional Trust Decline */}
           <motion.div
             variants={itemVariants}
-            className="grid grid-cols-2 gap-6 pt-12 border-t border-white/10"
+            className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-12 border-t border-white/10"
           >
-            {stats.map((stat, index) => (
-              <motion.div
-                key={index}
-                variants={statsVariants}
-                custom={index}
-                className={cn(
-                  'text-center lg:text-left p-4 rounded-xl transition-all duration-300',
-                  stat.highlight && 'bg-accent-red/20 border border-accent-red/30'
-                )}
-              >
-                <div className={cn(
-                  'text-headline font-serif font-bold mb-1',
-                  stat.highlight ? 'text-accent-red' : 'text-white'
-                )}>
-                  <AnimatedCounter target={stat.number} suffix={stat.suffix} duration={stat.highlight ? 2500 : 2000} />
+            {/* Group stats in pairs (then/now) */}
+            {[0, 2, 4, 6, 8, 10, 12, 14].map((pairIndex) => (
+              <div key={pairIndex} className="text-center">
+                {/* Institution name */}
+                <div className="text-xs font-sans font-semibold uppercase tracking-wider text-white/60 mb-3">
+                  {pairIndex === 0 ? "Gov't" : pairIndex === 2 ? 'Congress' : pairIndex === 4 ? 'Supreme Court' : pairIndex === 6 ? 'Presidency' : pairIndex === 8 ? 'TV News' : pairIndex === 10 ? 'Big Business' : pairIndex === 12 ? 'Criminal Justice' : 'Newspapers'}
                 </div>
-                <div className={cn(
-                  'text-xs font-sans font-semibold uppercase tracking-wider',
-                  stat.highlight ? 'text-accent-red/80' : 'text-white/50'
-                )}>
-                  {stat.label}
+                {/* Then stat */}
+                <div className="text-white text-2xl font-serif font-bold">
+                  <AnimatedCounter target={stats[pairIndex].number} suffix="%" duration={2000} />
                 </div>
-              </motion.div>
+                <div className="text-white/40 text-xs mb-2">
+                  {pairIndex === 0 ? '1958' : pairIndex === 2 ? '1973' : pairIndex === 4 ? '1988' : pairIndex === 6 ? '1975' : pairIndex === 8 ? '1993' : pairIndex === 10 ? '1975' : pairIndex === 12 ? '2004' : '1979'}
+                </div>
+                {/* Arrow */}
+                <div className="text-white/30 text-sm mb-2">↓</div>
+                {/* Now stat */}
+                <div className="text-accent-red text-2xl font-serif font-bold">
+                  <AnimatedCounter target={stats[pairIndex + 1].number} suffix="%" duration={2500} />
+                </div>
+                <div className="text-accent-red/60 text-xs">Today</div>
+              </div>
             ))}
           </motion.div>
         </motion.div>
@@ -228,7 +227,7 @@ export default function Hero() {
               {/* Decorative Badge */}
               <div className="absolute -top-4 -right-4 z-20">
                 <div className="bg-secondary-500 text-primary-500 px-4 py-2 rounded-full font-sans font-bold text-sm shadow-medium">
-                  Coming August 2025
+                  Forthcoming 2026
                 </div>
               </div>
             </div>

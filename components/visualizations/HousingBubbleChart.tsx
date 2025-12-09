@@ -1,342 +1,208 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 
-// U.S. National Home Price Index data 2000-2010 (approximated from the R code)
+// U.S. National Home Price Index data 2000-2010
 const housingData = [
-  { year: 2000.0, index: 227 },
-  { year: 2000.5, index: 232 },
-  { year: 2001.0, index: 240 },
-  { year: 2001.5, index: 248 },
-  { year: 2002.0, index: 255 },
-  { year: 2002.5, index: 265 },
-  { year: 2003.0, index: 275 },
-  { year: 2003.5, index: 290 },
-  { year: 2004.0, index: 310 },
-  { year: 2004.5, index: 330 },
-  { year: 2005.0, index: 355 },
-  { year: 2005.5, index: 365 },
-  { year: 2006.0, index: 370 },
-  { year: 2006.5, index: 365 },
-  { year: 2007.0, index: 355 },
-  { year: 2007.5, index: 340 },
-  { year: 2008.0, index: 310 },
-  { year: 2008.5, index: 280 },
-  { year: 2009.0, index: 260 },
-  { year: 2009.5, index: 255 },
-  { year: 2010.0, index: 250 },
-]
-
-// Crisis periods
-const crisisPeriods = [
-  { start: 2000.25, end: 2002.75, label: 'Dot-Com Crisis', color: 'rgba(239, 68, 68, 0.15)' },
-  { start: 2007.75, end: 2009.5, label: 'Financial Crisis', color: 'rgba(220, 38, 38, 0.25)' },
+  { year: 2000, index: 227 },
+  { year: 2001, index: 244 },
+  { year: 2002, index: 260 },
+  { year: 2003, index: 283 },
+  { year: 2004, index: 320 },
+  { year: 2005, index: 360 },
+  { year: 2006, index: 370 },
+  { year: 2007, index: 355 },
+  { year: 2008, index: 295 },
+  { year: 2009, index: 257 },
+  { year: 2010, index: 250 },
 ]
 
 export default function HousingBubbleChart() {
-  const [isVisible, setIsVisible] = useState(false)
-  const [animationProgress, setAnimationProgress] = useState(0)
-  const [hoveredPoint, setHoveredPoint] = useState<number | null>(null)
-  const chartRef = useRef<HTMLDivElement>(null)
+  const [animated, setAnimated] = useState(false)
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true)
-        }
-      },
-      { threshold: 0.3 }
-    )
-
-    if (chartRef.current) {
-      observer.observe(chartRef.current)
-    }
-
-    return () => observer.disconnect()
+    const timer = setTimeout(() => setAnimated(true), 100)
+    return () => clearTimeout(timer)
   }, [])
 
-  useEffect(() => {
-    if (isVisible && animationProgress < 1) {
-      const duration = 2000
-      const startTime = Date.now()
+  const maxIndex = Math.max(...housingData.map(d => d.index))
+  const minIndex = Math.min(...housingData.map(d => d.index))
+  const range = maxIndex - minIndex
 
-      const animate = () => {
-        const elapsed = Date.now() - startTime
-        const progress = Math.min(elapsed / duration, 1)
-        const eased = 1 - Math.pow(1 - progress, 3)
-        setAnimationProgress(eased)
-
-        if (progress < 1) {
-          requestAnimationFrame(animate)
-        }
-      }
-
-      requestAnimationFrame(animate)
-    }
-  }, [isVisible, animationProgress])
-
-  const chartWidth = 750
-  const chartHeight = 420
-  const padding = { top: 50, right: 40, bottom: 70, left: 80 }
-  const innerWidth = chartWidth - padding.left - padding.right
-  const innerHeight = chartHeight - padding.top - padding.bottom
-
-  const minYear = 2000
-  const maxYear = 2010
-  const minIndex = 200
-  const maxIndex = 400
-
-  const xScale = (year: number) =>
-    padding.left + ((year - minYear) / (maxYear - minYear)) * innerWidth
-
-  const yScale = (index: number) =>
-    padding.top + innerHeight - ((index - minIndex) / (maxIndex - minIndex)) * innerHeight
-
-  // Create area path
-  const areaPath = housingData
-    .map((d, i) => {
-      const x = xScale(d.year)
-      const animatedIndex = minIndex + (d.index - minIndex) * animationProgress
-      const y = yScale(animatedIndex)
-      return `${i === 0 ? 'M' : 'L'} ${x} ${y}`
-    })
-    .join(' ') + ` L ${xScale(2010)} ${yScale(minIndex)} L ${xScale(2000)} ${yScale(minIndex)} Z`
-
-  // Create line path
-  const linePath = housingData
-    .map((d, i) => {
-      const x = xScale(d.year)
-      const animatedIndex = minIndex + (d.index - minIndex) * animationProgress
-      const y = yScale(animatedIndex)
-      return `${i === 0 ? 'M' : 'L'} ${x} ${y}`
-    })
-    .join(' ')
-
-  // Find peak point
-  const peakData = housingData.reduce((max, d) => d.index > max.index ? d : max, housingData[0])
+  // Find peak
+  const peakYear = housingData.find(d => d.index === maxIndex)?.year
 
   return (
-    <div ref={chartRef} className="w-full">
-      <svg
-        viewBox={`0 0 ${chartWidth} ${chartHeight}`}
-        className="w-full h-auto"
-        style={{ maxWidth: chartWidth }}
-      >
-        {/* Gradient definition */}
-        <defs>
-          <linearGradient id="housingGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#dc2626" stopOpacity={0.4} />
-            <stop offset="100%" stopColor="#dc2626" stopOpacity={0.05} />
-          </linearGradient>
-        </defs>
+    <div className="w-full">
+      {/* Title */}
+      <h3 className="text-center text-lg font-serif font-semibold text-primary-500 mb-6">
+        U.S. National Home Price Index (2000-2010)
+      </h3>
 
-        {/* Crisis periods */}
-        {crisisPeriods.map((period, i) => (
-          <g key={i}>
-            <rect
-              x={xScale(period.start)}
-              y={padding.top}
-              width={xScale(period.end) - xScale(period.start)}
-              height={innerHeight}
-              fill={period.color}
-            />
-            <text
-              x={xScale((period.start + period.end) / 2)}
-              y={padding.top + 20}
-              textAnchor="middle"
-              className="fill-red-700 text-xs font-semibold"
-            >
-              {period.label}
-            </text>
-          </g>
-        ))}
+      {/* Chart */}
+      <div className="relative h-72 bg-gradient-to-b from-slate-50 to-white rounded-xl p-4">
+        {/* Y-axis labels */}
+        <div className="absolute left-0 top-4 bottom-10 w-12 flex flex-col justify-between text-right pr-2">
+          <span className="text-xs text-neutral-400">{maxIndex}</span>
+          <span className="text-xs text-neutral-400">{Math.round((maxIndex + minIndex) / 2)}</span>
+          <span className="text-xs text-neutral-400">{minIndex}</span>
+        </div>
 
-        {/* Y-axis gridlines */}
-        {[200, 250, 300, 350, 400].map(value => (
-          <g key={value}>
-            <line
-              x1={padding.left}
-              y1={yScale(value)}
-              x2={chartWidth - padding.right}
-              y2={yScale(value)}
-              stroke="#e5e5e5"
-              strokeDasharray="4 4"
+        {/* Crisis shading */}
+        <div
+          className="absolute top-4 bottom-10 bg-red-100/60 rounded"
+          style={{
+            left: 'calc(12px + 63.6%)',
+            width: '27%'
+          }}
+        >
+          <span className="text-xs text-red-600 font-bold absolute top-1 left-1/2 -translate-x-1/2 whitespace-nowrap">
+            Crisis
+          </span>
+        </div>
+
+        {/* Line chart */}
+        <div className="absolute left-14 right-4 top-4 bottom-10">
+          <svg className="w-full h-full" viewBox="0 0 440 200" preserveAspectRatio="none">
+            {/* Area under line */}
+            <defs>
+              <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="#ef4444" stopOpacity="0.3" />
+                <stop offset="100%" stopColor="#ef4444" stopOpacity="0.05" />
+              </linearGradient>
+            </defs>
+
+            {/* Grid lines */}
+            {[0, 50, 100, 150, 200].map(y => (
+              <line
+                key={y}
+                x1="0"
+                y1={y}
+                x2="440"
+                y2={y}
+                stroke="#e5e5e5"
+                strokeDasharray="4 4"
+              />
+            ))}
+
+            {/* Area path */}
+            <path
+              d={`
+                M 0 ${200 - ((housingData[0].index - minIndex) / range) * 200 * (animated ? 1 : 0)}
+                ${housingData.map((d, i) => {
+                  const x = (i / (housingData.length - 1)) * 440
+                  const y = 200 - ((d.index - minIndex) / range) * 200 * (animated ? 1 : 0)
+                  return `L ${x} ${y}`
+                }).join(' ')}
+                L 440 200
+                L 0 200
+                Z
+              `}
+              fill="url(#areaGradient)"
+              className="transition-all duration-1000"
             />
-            <text
-              x={padding.left - 10}
-              y={yScale(value)}
-              textAnchor="end"
-              dominantBaseline="middle"
-              className="fill-neutral-400 text-xs"
-            >
-              {value}
-            </text>
-          </g>
-        ))}
+
+            {/* Line */}
+            <path
+              d={`
+                M 0 ${200 - ((housingData[0].index - minIndex) / range) * 200 * (animated ? 1 : 0)}
+                ${housingData.map((d, i) => {
+                  const x = (i / (housingData.length - 1)) * 440
+                  const y = 200 - ((d.index - minIndex) / range) * 200 * (animated ? 1 : 0)
+                  return `L ${x} ${y}`
+                }).join(' ')}
+              `}
+              fill="none"
+              stroke="#ef4444"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="transition-all duration-1000"
+            />
+
+            {/* Data points */}
+            {housingData.map((d, i) => {
+              const x = (i / (housingData.length - 1)) * 440
+              const y = 200 - ((d.index - minIndex) / range) * 200 * (animated ? 1 : 0)
+              const isHovered = hoveredIndex === i
+              const isPeak = d.year === peakYear
+
+              return (
+                <g key={d.year}>
+                  <circle
+                    cx={x}
+                    cy={y}
+                    r={isHovered ? 8 : isPeak ? 6 : 4}
+                    fill={isPeak ? '#f97316' : '#ef4444'}
+                    stroke="white"
+                    strokeWidth="2"
+                    className="transition-all duration-200 cursor-pointer"
+                    onMouseEnter={() => setHoveredIndex(i)}
+                    onMouseLeave={() => setHoveredIndex(null)}
+                  />
+                  {isPeak && animated && (
+                    <text
+                      x={x}
+                      y={y - 15}
+                      textAnchor="middle"
+                      className="text-xs font-bold fill-orange-600"
+                    >
+                      Peak: {d.index}
+                    </text>
+                  )}
+                </g>
+              )
+            })}
+          </svg>
+        </div>
 
         {/* X-axis labels */}
-        {[2000, 2002, 2004, 2006, 2008, 2010].map(year => (
-          <text
-            key={year}
-            x={xScale(year)}
-            y={chartHeight - padding.bottom + 25}
-            textAnchor="middle"
-            className="fill-neutral-400 text-xs"
+        <div className="absolute left-14 right-4 bottom-0 flex justify-between px-0">
+          {housingData.filter((_, i) => i % 2 === 0).map(d => (
+            <span key={d.year} className="text-xs text-neutral-400">{d.year}</span>
+          ))}
+        </div>
+
+        {/* Tooltip */}
+        {hoveredIndex !== null && (
+          <div
+            className="absolute px-3 py-2 bg-white border border-red-200 rounded-lg shadow-lg z-10"
+            style={{
+              left: `calc(3.5rem + ${(hoveredIndex / (housingData.length - 1)) * 100}% - 40px)`,
+              top: '1rem'
+            }}
           >
-            {year}
-          </text>
-        ))}
-
-        {/* Area fill */}
-        <path
-          d={areaPath}
-          fill="url(#housingGradient)"
-        />
-
-        {/* Line */}
-        <path
-          d={linePath}
-          fill="none"
-          stroke="#dc2626"
-          strokeWidth={3}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-
-        {/* Peak annotation */}
-        {animationProgress > 0.8 && (
-          <g>
-            <line
-              x1={xScale(peakData.year)}
-              y1={yScale(minIndex + (peakData.index - minIndex) * animationProgress)}
-              x2={xScale(peakData.year)}
-              y2={yScale(minIndex + (peakData.index - minIndex) * animationProgress) - 30}
-              stroke="#dc2626"
-              strokeWidth={1}
-              strokeDasharray="3 3"
-            />
-            <text
-              x={xScale(peakData.year)}
-              y={yScale(minIndex + (peakData.index - minIndex) * animationProgress) - 35}
-              textAnchor="middle"
-              className="fill-red-600 text-xs font-bold"
-            >
-              Peak: 2006
-            </text>
-          </g>
+            <div className="font-bold text-red-600">{housingData[hoveredIndex].year}</div>
+            <div className="text-sm text-neutral-600">Index: {housingData[hoveredIndex].index}</div>
+          </div>
         )}
-
-        {/* Data points */}
-        {housingData.filter((_, i) => i % 2 === 0).map((d, i) => {
-          const isHovered = hoveredPoint === i
-          const animatedIndex = minIndex + (d.index - minIndex) * animationProgress
-          return (
-            <g
-              key={d.year}
-              onMouseEnter={() => setHoveredPoint(i)}
-              onMouseLeave={() => setHoveredPoint(null)}
-              style={{ cursor: 'pointer' }}
-            >
-              <circle
-                cx={xScale(d.year)}
-                cy={yScale(animatedIndex)}
-                r={isHovered ? 8 : 5}
-                fill="#dc2626"
-                stroke="white"
-                strokeWidth={2}
-                className="transition-all duration-200"
-              />
-              {isHovered && (
-                <g>
-                  <rect
-                    x={xScale(d.year) - 55}
-                    y={yScale(animatedIndex) - 45}
-                    width={110}
-                    height={35}
-                    fill="white"
-                    stroke="#dc2626"
-                    strokeWidth={1}
-                    rx={4}
-                  />
-                  <text
-                    x={xScale(d.year)}
-                    y={yScale(animatedIndex) - 30}
-                    textAnchor="middle"
-                    className="fill-red-600 font-bold text-xs"
-                  >
-                    {Math.floor(d.year)}
-                  </text>
-                  <text
-                    x={xScale(d.year)}
-                    y={yScale(animatedIndex) - 16}
-                    textAnchor="middle"
-                    className="fill-neutral-600 text-xs"
-                  >
-                    Index: {d.index}
-                  </text>
-                </g>
-              )}
-            </g>
-          )
-        })}
-
-        {/* Title */}
-        <text
-          x={chartWidth / 2}
-          y={25}
-          textAnchor="middle"
-          className="fill-primary-500 font-serif text-base font-semibold"
-        >
-          U.S. Home Price Index: The Housing Bubble (2000-2010)
-        </text>
-
-        {/* Y-axis label */}
-        <text
-          x={-chartHeight / 2}
-          y={25}
-          transform="rotate(-90)"
-          textAnchor="middle"
-          className="fill-neutral-500 text-xs"
-        >
-          Home Price Index (1980 Q1 = 100)
-        </text>
-
-        {/* X-axis label */}
-        <text
-          x={chartWidth / 2}
-          y={chartHeight - 15}
-          textAnchor="middle"
-          className="fill-neutral-500 text-xs"
-        >
-          Year
-        </text>
-      </svg>
+      </div>
 
       {/* Key Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-        <div className="bg-red-50 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-red-600">57.7%</div>
-          <div className="text-sm text-neutral-600">Peak Rise (2000-2006)</div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+        <div className="bg-orange-50 rounded-xl p-4 text-center border-t-4 border-orange-500">
+          <div className="text-2xl font-bold text-orange-600">+63%</div>
+          <div className="text-sm text-neutral-600">Rise (2000-2006)</div>
         </div>
-        <div className="bg-red-50 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-red-600">-36%</div>
-          <div className="text-sm text-neutral-600">Crash (2006-2009)</div>
+        <div className="bg-red-50 rounded-xl p-4 text-center border-t-4 border-red-500">
+          <div className="text-2xl font-bold text-red-600">-32%</div>
+          <div className="text-sm text-neutral-600">Crash (2006-2010)</div>
         </div>
-        <div className="bg-red-50 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-red-600">$5T</div>
-          <div className="text-sm text-neutral-600">Home Equity Lost</div>
+        <div className="bg-red-50 rounded-xl p-4 text-center border-t-4 border-red-600">
+          <div className="text-2xl font-bold text-red-700">$5T</div>
+          <div className="text-sm text-neutral-600">Equity Lost</div>
         </div>
-        <div className="bg-red-50 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-red-600">2.3M</div>
-          <div className="text-sm text-neutral-600">Foreclosures (2008)</div>
+        <div className="bg-red-50 rounded-xl p-4 text-center border-t-4 border-red-700">
+          <div className="text-2xl font-bold text-red-800">2.3M</div>
+          <div className="text-sm text-neutral-600">Foreclosures</div>
         </div>
       </div>
 
       {/* Key insight */}
-      <div className="mt-6 p-4 bg-red-50 rounded-lg border-l-4 border-red-500">
+      <div className="mt-6 p-4 bg-gradient-to-r from-orange-50 to-red-50 rounded-lg border-l-4 border-red-500">
         <p className="text-neutral-700 text-sm">
-          <strong>Bubble and Bust:</strong> National home prices rose 57.7% from 2000 to their 2006 peak before collapsing.
+          <strong>Bubble and Bust:</strong> National home prices rose 63% from 2000 to their 2006 peak before collapsing 32%.
           The housing bubble was fueled by low interest rates, lax lending standards, and financial deregulation—
           culminating in the worst financial crisis since the Great Depression.
         </p>

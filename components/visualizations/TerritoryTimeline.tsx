@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 
 const territoryData = [
   {
@@ -33,37 +33,34 @@ const territoryData = [
   },
 ]
 
-export default function TerritoryTimeline() {
-  const [isVisible, setIsVisible] = useState(false)
-  const [activeYear, setActiveYear] = useState(0)
+interface TerritoryTimelineProps {
+  initialYear?: 1770 | 1800 | 1809 | 1850
+}
+
+export default function TerritoryTimeline({ initialYear = 1770 }: TerritoryTimelineProps) {
+  // Find the index for the initial year
+  const initialIndex = territoryData.findIndex(d => d.year === initialYear)
+  const startIndex = initialIndex >= 0 ? initialIndex : 0
+
+  const [animated, setAnimated] = useState(false)
+  const [activeYear, setActiveYear] = useState(startIndex)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
-  const chartRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true)
-        }
-      },
-      { threshold: 0.3 }
-    )
-
-    if (chartRef.current) {
-      observer.observe(chartRef.current)
-    }
-
-    return () => observer.disconnect()
+    // Start animation after mount
+    const timer = setTimeout(() => setAnimated(true), 100)
+    return () => clearTimeout(timer)
   }, [])
 
   useEffect(() => {
-    if (isVisible && isAutoPlaying && activeYear < territoryData.length - 1) {
+    // Auto-play through remaining years after animation starts
+    if (animated && isAutoPlaying && activeYear < territoryData.length - 1) {
       const timer = setTimeout(() => {
         setActiveYear(prev => prev + 1)
       }, 1500)
       return () => clearTimeout(timer)
     }
-  }, [isVisible, activeYear, isAutoPlaying])
+  }, [animated, activeYear, isAutoPlaying])
 
   const maxArea = Math.max(...territoryData.map(d => d.area))
 
@@ -72,8 +69,17 @@ export default function TerritoryTimeline() {
     setActiveYear(index)
   }
 
+  // Get current territory data for focused display
+  const currentTerritory = territoryData[activeYear]
+  const startTerritory = territoryData[startIndex]
+
   return (
-    <div ref={chartRef} className="w-full">
+    <div className="w-full">
+      {/* Title showing the figure's focus year */}
+      <h3 className="text-center text-lg font-serif font-semibold text-primary-500 mb-6">
+        U.S. Territorial Expansion: {startTerritory.year} - {startTerritory.name}
+      </h3>
+
       {/* Year selector buttons */}
       <div className="flex justify-center gap-3 mb-8">
         {territoryData.map((item, i) => (
@@ -81,12 +87,12 @@ export default function TerritoryTimeline() {
             key={item.year}
             onClick={() => handleYearClick(i)}
             className={`px-5 py-3 rounded-xl text-sm font-bold transition-all duration-300 ${
-              i <= activeYear
+              i <= activeYear && animated
                 ? 'text-white shadow-lg scale-105'
                 : 'bg-neutral-100 text-neutral-400 hover:bg-neutral-200'
             }`}
             style={{
-              backgroundColor: i <= activeYear ? item.color : undefined,
+              backgroundColor: i <= activeYear && animated ? item.color : undefined,
             }}
           >
             {item.year}
@@ -99,7 +105,7 @@ export default function TerritoryTimeline() {
         {/* Timeline items */}
         <div className="space-y-6">
           {territoryData.map((item, i) => {
-            const isActive = i <= activeYear
+            const isActive = animated && i <= activeYear
             const isCurrent = i === activeYear
             const sizePercent = (item.area / maxArea) * 100
 
@@ -114,7 +120,7 @@ export default function TerritoryTimeline() {
                   {/* Year badge */}
                   <div
                     className={`w-20 h-20 rounded-2xl flex items-center justify-center text-2xl font-bold transition-all duration-500 ${
-                      isCurrent ? 'scale-110 shadow-xl' : ''
+                      isCurrent && animated ? 'scale-110 shadow-xl' : ''
                     }`}
                     style={{
                       backgroundColor: isActive ? item.color : '#e5e7eb',

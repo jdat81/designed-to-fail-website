@@ -90,19 +90,16 @@ function DefaultVisualization({ slug }: { slug: string }) {
   )
 }
 
-// Map figure slugs to visualization components
-const visualizationMap: Record<string, React.ComponentType> = {
+// Map figure slugs to visualization components (excluding territory maps which need special handling)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const visualizationMap: Record<string, React.ComponentType<any>> = {
   // Trust decline
   '8-1-trust-decline': TrustDeclineChart,
-  // Income inequality
+  // Income inequality - map both old and new slug formats
   '9-1-mean-income': IncomeInequalityChart,
+  '9-1-inequality': IncomeInequalityChart,
   '9-2-share-income': IncomeInequalityChart,
   '9-3-wealth-share': IncomeInequalityChart,
-  // Territory maps
-  '5-1-territories-1770': TerritoryTimeline,
-  '5-2-territories-1800': TerritoryTimeline,
-  '5-3-territories-1809': TerritoryTimeline,
-  '5-4-territories-1850': TerritoryTimeline,
   // Minerals
   '5-5-minerals-1913': MineralOutputChart,
   // Walmart growth
@@ -115,11 +112,31 @@ const visualizationMap: Record<string, React.ComponentType> = {
   '11-4-income-share': WealthDistributionChart,
 }
 
+// Map territory slugs to their initial years
+const territoryYears: Record<string, number> = {
+  '5-1-territories-1770': 1770,
+  '5-1-territories-1850': 1850,
+  '5-2-territories-1800': 1800,
+  '5-3-territories-1809': 1809,
+  '5-4-territories-1850': 1850,
+}
+
 interface FigureVisualizationProps {
   slug: string
 }
 
 export default function FigureVisualization({ slug }: FigureVisualizationProps) {
+  // Check if this is a territory visualization that needs a specific year
+  const initialYear = territoryYears[slug]
+
+  if (initialYear) {
+    return (
+      <div className="max-w-4xl mx-auto mb-12 bg-white rounded-xl p-6 lg:p-8 shadow-soft">
+        <TerritoryTimeline initialYear={initialYear as 1770 | 1800 | 1809 | 1850} />
+      </div>
+    )
+  }
+
   const VisualizationComponent = visualizationMap[slug]
 
   if (VisualizationComponent) {

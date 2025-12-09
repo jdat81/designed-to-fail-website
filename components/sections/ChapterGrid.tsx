@@ -70,8 +70,8 @@ export default function ChapterGrid() {
         {/* Section Header */}
         <ScrollReveal className="text-center mb-16">
           <h2 className="font-serif text-display text-primary-500 mb-4">
-            12 Chapters of{' '}
-            <span className="text-accent-red">Discovery</span>
+            Inside the{' '}
+            <span className="text-accent-red">Book</span>
           </h2>
           <p className="text-body-lg text-neutral-600 max-w-2xl mx-auto">
             From the founding fathers&apos; fear of democracy to today&apos;s broken politics—a comprehensive analysis of institutional failure.

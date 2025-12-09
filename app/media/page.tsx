@@ -121,7 +121,7 @@ export default function MediaPage() {
                 </div>
                 <div className="flex justify-between py-3 border-b border-neutral-200">
                   <span className="text-neutral-500">Publication Date</span>
-                  <span className="text-neutral-700">August 15, 2025</span>
+                  <span className="text-neutral-700">Forthcoming 2026</span>
                 </div>
                 <div className="flex justify-between py-3 border-b border-neutral-200">
                   <span className="text-neutral-500">Pages</span>

@@ -38,7 +38,7 @@ export default function Footer() {
               By Sven Steinmo &amp; John D&apos;Attoma
             </p>
             <p className="mt-2 text-secondary-400 text-sm font-semibold">
-              Yale University Press • August 2025
+              Yale University Press • Forthcoming 2026
             </p>
           </div>
 

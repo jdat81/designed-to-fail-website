@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 
 // Walmart store count data 1962-2005
 const walmartData = [
@@ -17,272 +17,114 @@ const walmartData = [
   { year: 2005, stores: 6141 },
 ]
 
-// Key milestones
 const milestones = [
-  { year: 1962, label: 'First store opens in Arkansas' },
-  { year: 1970, label: 'Goes public on NYSE' },
-  { year: 1988, label: 'First Supercenter opens' },
-  { year: 1991, label: 'Expands internationally' },
-  { year: 2002, label: 'Becomes world\'s largest company' },
+  { year: 1962, event: 'First store opens in Rogers, Arkansas' },
+  { year: 1970, event: 'Goes public on NYSE' },
+  { year: 1988, event: 'First Supercenter opens' },
+  { year: 1991, event: 'Expands internationally' },
+  { year: 2002, event: 'Becomes world\'s largest company' },
 ]
 
 export default function WalmartGrowthChart() {
-  const [isVisible, setIsVisible] = useState(false)
-  const [animationProgress, setAnimationProgress] = useState(0)
-  const [hoveredPoint, setHoveredPoint] = useState<number | null>(null)
-  const chartRef = useRef<HTMLDivElement>(null)
+  const [animated, setAnimated] = useState(false)
+  const [hoveredYear, setHoveredYear] = useState<number | null>(null)
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true)
-        }
-      },
-      { threshold: 0.3 }
-    )
-
-    if (chartRef.current) {
-      observer.observe(chartRef.current)
-    }
-
-    return () => observer.disconnect()
+    const timer = setTimeout(() => setAnimated(true), 100)
+    return () => clearTimeout(timer)
   }, [])
 
-  useEffect(() => {
-    if (isVisible && animationProgress < 1) {
-      const duration = 2000
-      const startTime = Date.now()
-
-      const animate = () => {
-        const elapsed = Date.now() - startTime
-        const progress = Math.min(elapsed / duration, 1)
-        const eased = 1 - Math.pow(1 - progress, 3)
-        setAnimationProgress(eased)
-
-        if (progress < 1) {
-          requestAnimationFrame(animate)
-        }
-      }
-
-      requestAnimationFrame(animate)
-    }
-  }, [isVisible, animationProgress])
-
-  const chartWidth = 700
-  const chartHeight = 400
-  const padding = { top: 40, right: 30, bottom: 60, left: 70 }
-  const innerWidth = chartWidth - padding.left - padding.right
-  const innerHeight = chartHeight - padding.top - padding.bottom
-
-  const minYear = 1962
-  const maxYear = 2005
-  const maxStores = 7000
-
-  const xScale = (year: number) =>
-    padding.left + ((year - minYear) / (maxYear - minYear)) * innerWidth
-
-  const yScale = (stores: number) =>
-    padding.top + innerHeight - (stores / maxStores) * innerHeight
-
-  // Create area path
-  const areaPath = walmartData
-    .map((d, i) => {
-      const x = xScale(d.year)
-      const y = yScale(d.stores * animationProgress)
-      return `${i === 0 ? 'M' : 'L'} ${x} ${y}`
-    })
-    .join(' ') + ` L ${xScale(2005)} ${yScale(0)} L ${xScale(1962)} ${yScale(0)} Z`
-
-  // Create line path
-  const linePath = walmartData
-    .map((d, i) => {
-      const x = xScale(d.year)
-      const y = yScale(d.stores * animationProgress)
-      return `${i === 0 ? 'M' : 'L'} ${x} ${y}`
-    })
-    .join(' ')
+  const maxStores = Math.max(...walmartData.map(d => d.stores))
 
   return (
-    <div ref={chartRef} className="w-full">
-      <svg
-        viewBox={`0 0 ${chartWidth} ${chartHeight}`}
-        className="w-full h-auto"
-        style={{ maxWidth: chartWidth }}
-      >
-        {/* Gradient definition */}
-        <defs>
-          <linearGradient id="walmartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#0071CE" stopOpacity={0.4} />
-            <stop offset="100%" stopColor="#0071CE" stopOpacity={0.05} />
-          </linearGradient>
-        </defs>
+    <div className="w-full">
+      {/* Title */}
+      <h3 className="text-center text-lg font-serif font-semibold text-primary-500 mb-6">
+        Growth of Walmart (1962-2005)
+      </h3>
 
-        {/* Y-axis gridlines */}
-        {[0, 1000, 2000, 3000, 4000, 5000, 6000, 7000].map(value => (
-          <g key={value}>
-            <line
-              x1={padding.left}
-              y1={yScale(value)}
-              x2={chartWidth - padding.right}
-              y2={yScale(value)}
-              stroke="#e5e5e5"
-              strokeDasharray="4 4"
-            />
-            <text
-              x={padding.left - 10}
-              y={yScale(value)}
-              textAnchor="end"
-              dominantBaseline="middle"
-              className="fill-neutral-400 text-xs"
-            >
-              {value.toLocaleString()}
-            </text>
-          </g>
-        ))}
+      {/* Bar Chart */}
+      <div className="flex items-end justify-between gap-2 h-64 px-4">
+        {walmartData.map((item, index) => {
+          const heightPercent = (item.stores / maxStores) * 100
+          const isHovered = hoveredYear === item.year
 
-        {/* X-axis labels */}
-        {walmartData.filter((_, i) => i % 2 === 0).map(d => (
-          <text
-            key={d.year}
-            x={xScale(d.year)}
-            y={chartHeight - padding.bottom + 20}
-            textAnchor="middle"
-            className="fill-neutral-400 text-xs"
-          >
-            {d.year}
-          </text>
-        ))}
-
-        {/* Area fill */}
-        <path
-          d={areaPath}
-          fill="url(#walmartGradient)"
-        />
-
-        {/* Line */}
-        <path
-          d={linePath}
-          fill="none"
-          stroke="#0071CE"
-          strokeWidth={3}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-
-        {/* Data points */}
-        {walmartData.map((d, i) => {
-          const isHovered = hoveredPoint === i
           return (
-            <g
-              key={d.year}
-              onMouseEnter={() => setHoveredPoint(i)}
-              onMouseLeave={() => setHoveredPoint(null)}
-              style={{ cursor: 'pointer' }}
+            <div
+              key={item.year}
+              className="flex-1 flex flex-col items-center"
+              onMouseEnter={() => setHoveredYear(item.year)}
+              onMouseLeave={() => setHoveredYear(null)}
             >
-              <circle
-                cx={xScale(d.year)}
-                cy={yScale(d.stores * animationProgress)}
-                r={isHovered ? 8 : 5}
-                fill="#0071CE"
-                stroke="white"
-                strokeWidth={2}
-                className="transition-all duration-200"
-              />
-              {/* Tooltip on hover */}
+              {/* Tooltip */}
               {isHovered && (
-                <g>
-                  <rect
-                    x={xScale(d.year) - 50}
-                    y={yScale(d.stores * animationProgress) - 45}
-                    width={100}
-                    height={35}
-                    fill="white"
-                    stroke="#0071CE"
-                    strokeWidth={1}
-                    rx={4}
-                  />
-                  <text
-                    x={xScale(d.year)}
-                    y={yScale(d.stores * animationProgress) - 30}
-                    textAnchor="middle"
-                    className="fill-primary-500 font-bold text-xs"
-                  >
-                    {d.year}
-                  </text>
-                  <text
-                    x={xScale(d.year)}
-                    y={yScale(d.stores * animationProgress) - 16}
-                    textAnchor="middle"
-                    className="fill-neutral-600 text-xs"
-                  >
-                    {d.stores.toLocaleString()} stores
-                  </text>
-                </g>
+                <div className="mb-2 px-2 py-1 bg-blue-600 text-white text-xs rounded shadow-lg whitespace-nowrap">
+                  {item.stores.toLocaleString()} stores
+                </div>
               )}
-            </g>
+
+              {/* Bar */}
+              <div
+                className="w-full rounded-t-lg transition-all duration-700 ease-out cursor-pointer"
+                style={{
+                  height: animated ? `${heightPercent}%` : '0%',
+                  backgroundColor: isHovered ? '#1d4ed8' : '#3b82f6',
+                  transitionDelay: `${index * 80}ms`,
+                  minHeight: animated ? '4px' : '0px',
+                }}
+              />
+
+              {/* Year label */}
+              <div className="mt-2 text-xs text-neutral-500 transform -rotate-45 origin-top-left">
+                {item.year}
+              </div>
+            </div>
           )
         })}
+      </div>
 
-        {/* Title */}
-        <text
-          x={chartWidth / 2}
-          y={20}
-          textAnchor="middle"
-          className="fill-primary-500 font-serif text-base font-semibold"
-        >
-          Growth of Walmart (1962-2005)
-        </text>
+      {/* Y-axis reference */}
+      <div className="flex justify-end mt-4 pr-4">
+        <span className="text-xs text-neutral-400">Max: {maxStores.toLocaleString()} stores</span>
+      </div>
 
-        {/* Y-axis label */}
-        <text
-          x={-chartHeight / 2}
-          y={20}
-          transform="rotate(-90)"
-          textAnchor="middle"
-          className="fill-neutral-500 text-xs"
-        >
-          Number of Stores
-        </text>
-      </svg>
-
-      {/* Legend / Key Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-        <div className="bg-blue-50 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-blue-600">1</div>
+      {/* Key Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+        <div className="bg-blue-50 rounded-xl p-4 text-center border-t-4 border-blue-500">
+          <div className="text-3xl font-bold text-blue-600">1</div>
           <div className="text-sm text-neutral-600">Store in 1962</div>
         </div>
-        <div className="bg-blue-50 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-blue-600">6,141</div>
+        <div className="bg-blue-50 rounded-xl p-4 text-center border-t-4 border-blue-600">
+          <div className="text-3xl font-bold text-blue-700">6,141</div>
           <div className="text-sm text-neutral-600">Stores in 2005</div>
         </div>
-        <div className="bg-blue-50 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-blue-600">614,000%</div>
+        <div className="bg-blue-50 rounded-xl p-4 text-center border-t-4 border-blue-700">
+          <div className="text-2xl font-bold text-blue-800">614,000%</div>
           <div className="text-sm text-neutral-600">Growth Rate</div>
         </div>
-        <div className="bg-blue-50 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-blue-600">43</div>
+        <div className="bg-blue-50 rounded-xl p-4 text-center border-t-4 border-blue-800">
+          <div className="text-3xl font-bold text-blue-900">43</div>
           <div className="text-sm text-neutral-600">Years</div>
         </div>
       </div>
 
       {/* Milestones */}
-      <div className="mt-6 p-4 bg-neutral-50 rounded-lg">
-        <h4 className="font-semibold text-primary-500 mb-3">Key Milestones</h4>
-        <div className="space-y-2">
-          {milestones.map(m => (
-            <div key={m.year} className="flex items-center gap-3 text-sm">
-              <span className="font-bold text-blue-600 w-12">{m.year}</span>
-              <span className="text-neutral-600">{m.label}</span>
+      <div className="mt-8 bg-neutral-50 rounded-xl p-6">
+        <h4 className="font-semibold text-primary-500 mb-4">Key Milestones</h4>
+        <div className="space-y-3">
+          {milestones.map((m, i) => (
+            <div key={i} className="flex items-start gap-4">
+              <span className="font-bold text-blue-600 text-lg w-16 shrink-0">{m.year}</span>
+              <span className="text-neutral-600">{m.event}</span>
             </div>
           ))}
         </div>
       </div>
 
       {/* Key insight */}
-      <div className="mt-6 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+      <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-l-4 border-blue-500">
         <p className="text-neutral-700 text-sm">
-          <strong>Exponential growth:</strong> From a single store in Rogers, Arkansas to the world&apos;s largest retailer,
+          <strong>Exponential Growth:</strong> From a single store in Rogers, Arkansas to the world&apos;s largest retailer,
           Walmart&apos;s expansion illustrates corporate consolidation&apos;s acceleration and the systematic displacement
           of small retailers across America.
         </p>

@@ -55,7 +55,7 @@ export const authors: Author[] = [
       },
       {
         title: 'Designed to Fail',
-        year: 2025,
+        year: 2026,
         description: 'Final work explaining why American institutions produce dysfunction (with John D\'Attoma).',
       },
     ],
@@ -87,7 +87,7 @@ export const authors: Author[] = [
     notableWorks: [
       {
         title: 'Designed to Fail',
-        year: 2025,
+        year: 2026,
         description: 'Co-authored with Sven Steinmo, examining institutional roots of American political dysfunction.',
       },
     ],

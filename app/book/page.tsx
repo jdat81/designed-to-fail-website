@@ -44,7 +44,7 @@ export default function BookPage() {
             {/* Book Info */}
             <div className="order-1 lg:order-2">
               <span className="inline-block px-4 py-2 rounded-full bg-secondary-500/20 text-secondary-400 font-sans font-semibold text-sm uppercase tracking-wider mb-6">
-                Available August 2025
+                Forthcoming 2026
               </span>
               <h1 className="font-serif text-display text-white mb-6">
                 Designed to{' '}
@@ -65,7 +65,7 @@ export default function BookPage() {
                 </div>
                 <div className="bg-white/10 rounded-lg p-4">
                   <div className="text-white/50 mb-1">Publication</div>
-                  <div className="text-white font-semibold">August 15, 2025</div>
+                  <div className="text-white font-semibold">Forthcoming 2026</div>
                 </div>
                 <div className="bg-white/10 rounded-lg p-4">
                   <div className="text-white/50 mb-1">Pages</div>
@@ -152,7 +152,7 @@ export default function BookPage() {
             Pre-Order Your Copy
           </h2>
           <p className="text-body-lg text-white/70 max-w-2xl mx-auto mb-10">
-            Available August 15, 2025 from Yale University Press and all major booksellers.
+            Forthcoming 2026 from Yale University Press and all major booksellers.
           </p>
 
           <div className="flex flex-wrap justify-center gap-4 max-w-2xl mx-auto">

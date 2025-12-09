@@ -1,339 +1,28 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 
-// Wealth distribution data Q1 2025 from the R code
+// Wealth distribution data Q1 2025
 const wealthData = [
-  { category: 'Top 1%', value: 28.0, color: '#1e3a5f' },
-  { category: 'Next 9%\n(90th-99th)', value: 34.6, color: '#2563eb' },
-  { category: 'Next 40%\n(50th-90th)', value: 31.8, color: '#60a5fa' },
-  { category: 'Bottom 50%', value: 5.6, color: '#93c5fd' },
-]
-
-// Income share data 1970-2022 from the R code
-const incomeShareData = [
-  { year: 1970, lower: 10, middle: 62, upper: 29 },
-  { year: 1979, lower: 9, middle: 60, upper: 30 },
-  { year: 1989, lower: 8, middle: 54, upper: 38 },
-  { year: 1999, lower: 8, middle: 49, upper: 43 },
-  { year: 2009, lower: 9, middle: 45, upper: 46 },
-  { year: 2022, lower: 8, middle: 43, upper: 48 },
+  { category: 'Top 1%', value: 28.0, color: '#dc2626' },
+  { category: 'Next 9%', value: 34.6, color: '#f97316' },
+  { category: 'Next 40%', value: 31.8, color: '#3b82f6' },
+  { category: 'Bottom 50%', value: 5.6, color: '#8b5cf6' },
 ]
 
 export default function WealthDistributionChart() {
-  const [isVisible, setIsVisible] = useState(false)
-  const [animationProgress, setAnimationProgress] = useState(0)
+  const [animated, setAnimated] = useState(false)
   const [activeTab, setActiveTab] = useState<'wealth' | 'income'>('wealth')
-  const [hoveredBar, setHoveredBar] = useState<number | null>(null)
-  const chartRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true)
-        }
-      },
-      { threshold: 0.3 }
-    )
-
-    if (chartRef.current) {
-      observer.observe(chartRef.current)
-    }
-
-    return () => observer.disconnect()
+    const timer = setTimeout(() => setAnimated(true), 100)
+    return () => clearTimeout(timer)
   }, [])
 
-  useEffect(() => {
-    if (isVisible && animationProgress < 1) {
-      const duration = 1500
-      const startTime = Date.now()
-
-      const animate = () => {
-        const elapsed = Date.now() - startTime
-        const progress = Math.min(elapsed / duration, 1)
-        const eased = 1 - Math.pow(1 - progress, 3)
-        setAnimationProgress(eased)
-
-        if (progress < 1) {
-          requestAnimationFrame(animate)
-        }
-      }
-
-      requestAnimationFrame(animate)
-    }
-  }, [isVisible, animationProgress])
-
-  // Wealth Distribution Bar Chart
-  const renderWealthChart = () => {
-    const chartWidth = 700
-    const chartHeight = 380
-    const padding = { top: 50, right: 30, bottom: 100, left: 60 }
-    const innerWidth = chartWidth - padding.left - padding.right
-    const innerHeight = chartHeight - padding.top - padding.bottom
-
-    const barWidth = innerWidth / wealthData.length - 30
-    const maxValue = 40
-
-    return (
-      <svg
-        viewBox={`0 0 ${chartWidth} ${chartHeight}`}
-        className="w-full h-auto"
-        style={{ maxWidth: chartWidth }}
-      >
-        {/* Y-axis gridlines */}
-        {[0, 10, 20, 30, 40].map(value => (
-          <g key={value}>
-            <line
-              x1={padding.left}
-              y1={padding.top + innerHeight - (value / maxValue) * innerHeight}
-              x2={chartWidth - padding.right}
-              y2={padding.top + innerHeight - (value / maxValue) * innerHeight}
-              stroke="#e5e5e5"
-              strokeDasharray="4 4"
-            />
-            <text
-              x={padding.left - 10}
-              y={padding.top + innerHeight - (value / maxValue) * innerHeight}
-              textAnchor="end"
-              dominantBaseline="middle"
-              className="fill-neutral-400 text-xs"
-            >
-              {value}%
-            </text>
-          </g>
-        ))}
-
-        {/* Bars */}
-        {wealthData.map((d, i) => {
-          const barHeight = (d.value / maxValue) * innerHeight * animationProgress
-          const x = padding.left + i * (innerWidth / wealthData.length) + 15
-          const y = padding.top + innerHeight - barHeight
-          const isHovered = hoveredBar === i
-
-          return (
-            <g
-              key={d.category}
-              onMouseEnter={() => setHoveredBar(i)}
-              onMouseLeave={() => setHoveredBar(null)}
-              style={{ cursor: 'pointer' }}
-            >
-              <rect
-                x={x}
-                y={y}
-                width={barWidth}
-                height={barHeight}
-                fill={d.color}
-                rx={4}
-                className={`transition-all duration-200 ${isHovered ? 'opacity-80' : ''}`}
-              />
-              {/* Value label */}
-              {animationProgress > 0.5 && (
-                <text
-                  x={x + barWidth / 2}
-                  y={y - 10}
-                  textAnchor="middle"
-                  className="fill-primary-500 font-bold text-sm"
-                >
-                  {d.value}%
-                </text>
-              )}
-              {/* Category label */}
-              <text
-                x={x + barWidth / 2}
-                y={chartHeight - padding.bottom + 20}
-                textAnchor="middle"
-                className="fill-neutral-600 text-xs"
-              >
-                {d.category.split('\n').map((line, j) => (
-                  <tspan key={j} x={x + barWidth / 2} dy={j === 0 ? 0 : 14}>
-                    {line}
-                  </tspan>
-                ))}
-              </text>
-            </g>
-          )
-        })}
-
-        {/* Title */}
-        <text
-          x={chartWidth / 2}
-          y={25}
-          textAnchor="middle"
-          className="fill-primary-500 font-serif text-base font-semibold"
-        >
-          Distribution of U.S. Household Wealth (Q1 2025)
-        </text>
-
-        {/* Y-axis label */}
-        <text
-          x={-chartHeight / 2 + 30}
-          y={18}
-          transform="rotate(-90)"
-          textAnchor="middle"
-          className="fill-neutral-500 text-xs"
-        >
-          Share of Total Net Worth
-        </text>
-      </svg>
-    )
-  }
-
-  // Income Share Line Chart
-  const renderIncomeChart = () => {
-    const chartWidth = 700
-    const chartHeight = 380
-    const padding = { top: 50, right: 120, bottom: 60, left: 60 }
-    const innerWidth = chartWidth - padding.left - padding.right
-    const innerHeight = chartHeight - padding.top - padding.bottom
-
-    const minYear = 1970
-    const maxYear = 2022
-    const maxValue = 70
-
-    const xScale = (year: number) =>
-      padding.left + ((year - minYear) / (maxYear - minYear)) * innerWidth
-
-    const yScale = (value: number) =>
-      padding.top + innerHeight - (value / maxValue) * innerHeight
-
-    const createPath = (key: 'lower' | 'middle' | 'upper') => {
-      return incomeShareData
-        .map((d, i) => {
-          const x = xScale(d.year)
-          const y = yScale(d[key] * animationProgress)
-          return `${i === 0 ? 'M' : 'L'} ${x} ${y}`
-        })
-        .join(' ')
-    }
-
-    const lineStyles = [
-      { key: 'upper' as const, color: '#1e3a5f', label: 'Upper income', dash: '' },
-      { key: 'middle' as const, color: '#2563eb', label: 'Middle income', dash: '8 4' },
-      { key: 'lower' as const, color: '#60a5fa', label: 'Lower income', dash: '3 3' },
-    ]
-
-    return (
-      <svg
-        viewBox={`0 0 ${chartWidth} ${chartHeight}`}
-        className="w-full h-auto"
-        style={{ maxWidth: chartWidth }}
-      >
-        {/* Y-axis gridlines */}
-        {[0, 20, 40, 60].map(value => (
-          <g key={value}>
-            <line
-              x1={padding.left}
-              y1={yScale(value)}
-              x2={chartWidth - padding.right}
-              y2={yScale(value)}
-              stroke="#e5e5e5"
-              strokeDasharray="4 4"
-            />
-            <text
-              x={padding.left - 10}
-              y={yScale(value)}
-              textAnchor="end"
-              dominantBaseline="middle"
-              className="fill-neutral-400 text-xs"
-            >
-              {value}%
-            </text>
-          </g>
-        ))}
-
-        {/* X-axis labels */}
-        {incomeShareData.map(d => (
-          <text
-            key={d.year}
-            x={xScale(d.year)}
-            y={chartHeight - padding.bottom + 25}
-            textAnchor="middle"
-            className="fill-neutral-400 text-xs"
-          >
-            {d.year}
-          </text>
-        ))}
-
-        {/* Lines */}
-        {lineStyles.map(style => (
-          <g key={style.key}>
-            <path
-              d={createPath(style.key)}
-              fill="none"
-              stroke={style.color}
-              strokeWidth={2.5}
-              strokeDasharray={style.dash}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            {/* Points */}
-            {incomeShareData.map(d => (
-              <circle
-                key={d.year}
-                cx={xScale(d.year)}
-                cy={yScale(d[style.key] * animationProgress)}
-                r={4}
-                fill={style.color}
-                stroke="white"
-                strokeWidth={2}
-              />
-            ))}
-          </g>
-        ))}
-
-        {/* Legend */}
-        {lineStyles.map((style, i) => {
-          const lastData = incomeShareData[incomeShareData.length - 1]
-          return (
-            <g key={style.key}>
-              <line
-                x1={chartWidth - padding.right + 10}
-                y1={yScale(lastData[style.key] * animationProgress)}
-                x2={chartWidth - padding.right + 30}
-                y2={yScale(lastData[style.key] * animationProgress)}
-                stroke={style.color}
-                strokeWidth={2.5}
-                strokeDasharray={style.dash}
-              />
-              <text
-                x={chartWidth - padding.right + 35}
-                y={yScale(lastData[style.key] * animationProgress)}
-                dominantBaseline="middle"
-                className="fill-neutral-600 text-xs font-semibold"
-              >
-                {style.label} {Math.round(lastData[style.key])}%
-              </text>
-            </g>
-          )
-        })}
-
-        {/* Title */}
-        <text
-          x={chartWidth / 2}
-          y={25}
-          textAnchor="middle"
-          className="fill-primary-500 font-serif text-base font-semibold"
-        >
-          Share of U.S. Household Income by Tier (1970-2022)
-        </text>
-
-        {/* Y-axis label */}
-        <text
-          x={-chartHeight / 2 + 30}
-          y={18}
-          transform="rotate(-90)"
-          textAnchor="middle"
-          className="fill-neutral-500 text-xs"
-        >
-          Percent of Total Household Income
-        </text>
-      </svg>
-    )
-  }
+  const maxValue = Math.max(...wealthData.map(d => d.value))
 
   return (
-    <div ref={chartRef} className="w-full">
+    <div className="w-full">
       {/* Tab switcher */}
       <div className="flex gap-2 mb-6">
         <button
@@ -358,30 +47,179 @@ export default function WealthDistributionChart() {
         </button>
       </div>
 
-      {activeTab === 'wealth' ? renderWealthChart() : renderIncomeChart()}
+      {activeTab === 'wealth' ? (
+        <>
+          {/* Title */}
+          <h3 className="text-center text-lg font-serif font-semibold text-primary-500 mb-6">
+            Distribution of U.S. Household Wealth (Q1 2025)
+          </h3>
 
-      {/* Key Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-        <div className="bg-blue-50 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-blue-800">62.6%</div>
-          <div className="text-sm text-neutral-600">Wealth held by Top 10%</div>
-        </div>
-        <div className="bg-blue-50 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-blue-800">5.6%</div>
-          <div className="text-sm text-neutral-600">Wealth held by Bottom 50%</div>
-        </div>
-        <div className="bg-blue-50 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-blue-800">-19%</div>
-          <div className="text-sm text-neutral-600">Middle Class Income Share Loss</div>
-        </div>
-        <div className="bg-blue-50 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-blue-800">+19%</div>
-          <div className="text-sm text-neutral-600">Upper Income Share Gain</div>
-        </div>
-      </div>
+          {/* Bar Chart */}
+          <div className="flex items-end justify-around h-64 px-8 bg-gradient-to-b from-slate-50 to-white rounded-xl pt-8 pb-4">
+            {wealthData.map((item, index) => (
+              <div key={item.category} className="flex flex-col items-center flex-1 max-w-[140px]">
+                {/* Value label */}
+                <div
+                  className="mb-2 text-lg font-bold transition-opacity duration-500"
+                  style={{
+                    color: item.color,
+                    opacity: animated ? 1 : 0,
+                    transitionDelay: `${index * 150 + 500}ms`
+                  }}
+                >
+                  {item.value}%
+                </div>
+
+                {/* Bar */}
+                <div className="w-16 bg-neutral-100 rounded-t-lg overflow-hidden" style={{ height: '180px' }}>
+                  <div
+                    className="w-full rounded-t-lg transition-all duration-1000 ease-out"
+                    style={{
+                      height: animated ? `${(item.value / maxValue) * 100}%` : '0%',
+                      backgroundColor: item.color,
+                      marginTop: 'auto',
+                      position: 'relative',
+                      top: animated ? `${100 - (item.value / maxValue) * 100}%` : '100%',
+                      transitionDelay: `${index * 150}ms`,
+                    }}
+                  />
+                </div>
+
+                {/* Label */}
+                <div className="mt-3 text-xs text-center text-neutral-600 font-medium">
+                  {item.category}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Key Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+            <div className="bg-red-50 rounded-xl p-4 text-center border-t-4 border-red-500">
+              <div className="text-2xl font-bold text-red-600">62.6%</div>
+              <div className="text-sm text-neutral-600">Top 10% Share</div>
+            </div>
+            <div className="bg-purple-50 rounded-xl p-4 text-center border-t-4 border-purple-500">
+              <div className="text-2xl font-bold text-purple-600">5.6%</div>
+              <div className="text-sm text-neutral-600">Bottom 50% Share</div>
+            </div>
+            <div className="bg-orange-50 rounded-xl p-4 text-center border-t-4 border-orange-500">
+              <div className="text-2xl font-bold text-orange-600">11x</div>
+              <div className="text-sm text-neutral-600">Top vs Bottom Ratio</div>
+            </div>
+            <div className="bg-blue-50 rounded-xl p-4 text-center border-t-4 border-blue-500">
+              <div className="text-2xl font-bold text-blue-600">$150T</div>
+              <div className="text-sm text-neutral-600">Total US Wealth</div>
+            </div>
+          </div>
+        </>
+      ) : (
+        <>
+          {/* Income Share Over Time */}
+          <h3 className="text-center text-lg font-serif font-semibold text-primary-500 mb-6">
+            Share of U.S. Household Income by Tier (1970-2022)
+          </h3>
+
+          {/* Timeline comparison */}
+          <div className="grid grid-cols-2 gap-8">
+            {/* 1970 */}
+            <div className="bg-blue-50 rounded-xl p-6">
+              <h4 className="text-center font-bold text-blue-800 text-xl mb-4">1970</h4>
+              <div className="space-y-3">
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-neutral-600">Upper Income</span>
+                    <span className="font-bold text-red-600">29%</span>
+                  </div>
+                  <div className="h-4 bg-white rounded-full overflow-hidden">
+                    <div className="h-full bg-red-500 rounded-full" style={{ width: '29%' }} />
+                  </div>
+                </div>
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-neutral-600">Middle Income</span>
+                    <span className="font-bold text-blue-600">62%</span>
+                  </div>
+                  <div className="h-4 bg-white rounded-full overflow-hidden">
+                    <div className="h-full bg-blue-500 rounded-full" style={{ width: '62%' }} />
+                  </div>
+                </div>
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-neutral-600">Lower Income</span>
+                    <span className="font-bold text-purple-600">10%</span>
+                  </div>
+                  <div className="h-4 bg-white rounded-full overflow-hidden">
+                    <div className="h-full bg-purple-500 rounded-full" style={{ width: '10%' }} />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 2022 */}
+            <div className="bg-red-50 rounded-xl p-6">
+              <h4 className="text-center font-bold text-red-800 text-xl mb-4">2022</h4>
+              <div className="space-y-3">
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-neutral-600">Upper Income</span>
+                    <span className="font-bold text-red-600">48%</span>
+                  </div>
+                  <div className="h-4 bg-white rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-red-500 rounded-full transition-all duration-1000"
+                      style={{ width: animated ? '48%' : '29%' }}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-neutral-600">Middle Income</span>
+                    <span className="font-bold text-blue-600">43%</span>
+                  </div>
+                  <div className="h-4 bg-white rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-blue-500 rounded-full transition-all duration-1000"
+                      style={{ width: animated ? '43%' : '62%' }}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-neutral-600">Lower Income</span>
+                    <span className="font-bold text-purple-600">8%</span>
+                  </div>
+                  <div className="h-4 bg-white rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-purple-500 rounded-full transition-all duration-1000"
+                      style={{ width: animated ? '8%' : '10%' }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Change indicators */}
+          <div className="grid grid-cols-3 gap-4 mt-6">
+            <div className="bg-red-50 rounded-xl p-4 text-center border-l-4 border-red-500">
+              <div className="text-2xl font-bold text-red-600">+19%</div>
+              <div className="text-sm text-neutral-600">Upper Income Gain</div>
+            </div>
+            <div className="bg-blue-50 rounded-xl p-4 text-center border-l-4 border-blue-500">
+              <div className="text-2xl font-bold text-blue-600">-19%</div>
+              <div className="text-sm text-neutral-600">Middle Income Loss</div>
+            </div>
+            <div className="bg-purple-50 rounded-xl p-4 text-center border-l-4 border-purple-500">
+              <div className="text-2xl font-bold text-purple-600">-2%</div>
+              <div className="text-sm text-neutral-600">Lower Income Loss</div>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Key insight */}
-      <div className="mt-6 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+      <div className="mt-6 p-4 bg-gradient-to-r from-red-50 to-purple-50 rounded-lg border-l-4 border-red-500">
         <p className="text-neutral-700 text-sm">
           <strong>The Great Divergence:</strong> Since 1970, the middle class share of income has fallen from 62% to 43%,
           while the upper income share rose from 29% to 48%. The wealthiest 10% of households now hold nearly two-thirds
