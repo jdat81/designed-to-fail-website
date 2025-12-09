@@ -88,18 +88,18 @@ function TrustDeclineThumbnail() {
   ]
 
   return (
-    <div className="w-full h-full bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center p-4">
+    <div className="w-full h-full bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center p-4">
       <div className="w-full max-w-[180px]">
         <svg viewBox="0 0 120 80" className="w-full h-auto">
           {/* Grid */}
-          <line x1="10" y1="10" x2="10" y2="70" stroke="#fecaca" strokeWidth="1" />
-          <line x1="10" y1="70" x2="110" y2="70" stroke="#fecaca" strokeWidth="1" />
+          <line x1="10" y1="10" x2="10" y2="70" stroke="#fed7aa" strokeWidth="1" />
+          <line x1="10" y1="70" x2="110" y2="70" stroke="#fed7aa" strokeWidth="1" />
 
           {/* Area under line */}
           <defs>
             <linearGradient id="trustGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#ef4444" stopOpacity="0.4" />
-              <stop offset="100%" stopColor="#ef4444" stopOpacity="0.1" />
+              <stop offset="0%" stopColor="#f97316" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="#f97316" stopOpacity="0.1" />
             </linearGradient>
           </defs>
           <path
@@ -111,21 +111,21 @@ function TrustDeclineThumbnail() {
           <path
             d={`M 10 ${80 - points[0].y} ${points.map(p => `L ${10 + p.x} ${80 - p.y}`).join(' ')}`}
             fill="none"
-            stroke="#ef4444"
+            stroke="#f97316"
             strokeWidth="3"
             strokeLinecap="round"
           />
 
           {/* Start and end points */}
-          <circle cx="10" cy={80 - points[0].y} r="4" fill="#ef4444" />
-          <circle cx="110" cy={80 - points[4].y} r="4" fill="#ef4444" />
+          <circle cx="10" cy={80 - points[0].y} r="4" fill="#f97316" />
+          <circle cx="110" cy={80 - points[4].y} r="4" fill="#f97316" />
 
           {/* Labels */}
-          <text x="10" y={80 - points[0].y - 6} textAnchor="middle" className="text-[8px] font-bold" fill="#ef4444">73%</text>
-          <text x="110" y={80 - points[4].y + 12} textAnchor="middle" className="text-[8px] font-bold" fill="#ef4444">30%</text>
+          <text x="10" y={80 - points[0].y - 6} textAnchor="middle" className="text-[8px] font-bold" fill="#f97316">73%</text>
+          <text x="110" y={80 - points[4].y + 12} textAnchor="middle" className="text-[8px] font-bold" fill="#f97316">30%</text>
         </svg>
         <div className="text-center">
-          <span className="text-[10px] font-semibold text-red-600">Trust Collapse 1958-78</span>
+          <span className="text-[10px] font-semibold text-orange-600">Trust Collapse 1958-78</span>
         </div>
       </div>
     </div>

@@ -2,10 +2,10 @@
 
 import { useRef } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { motion, useInView } from 'framer-motion'
 import { figures } from '@/lib/content/figures'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
+import FigureThumbnail from '@/components/visualizations/FigureThumbnail'
 
 const cardVariants = {
   hidden: { opacity: 0, y: 30 },
@@ -34,14 +34,9 @@ function FigureCard({ figure, index }: { figure: typeof figures[0]; index: numbe
     >
       <Link href={`/figures/${figure.slug}`}>
         <div className="card-hover card-lift group h-full overflow-hidden">
-          {/* Figure Image */}
-          <div className="relative aspect-[4/3] bg-neutral-100">
-            <Image
-              src={figure.image}
-              alt={figure.caption}
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
-            />
+          {/* Figure Thumbnail */}
+          <div className="relative aspect-[4/3] bg-neutral-100 overflow-hidden">
+            <FigureThumbnail figure={figure} />
             <div className="absolute top-4 left-4">
               <span className="px-3 py-1 bg-primary-500/90 text-white text-xs font-semibold rounded-full">
                 Figure {figure.number}
